@@ -1,33 +1,23 @@
 
 
-Class Meio_transporte:
-    def __init__(self, tipo, capacidade, empresa_transporte):
+Class Itinerario:
+    def __init__(self, data_inicio, data_fim):
 
-        self.__tipo = tipo
-        self.__capacidade = capacidade
-        self.__empresa = empresa_transporte
-
-        @property
-        def tipo(self):
-            return self.__tipo
-
-        @tipo.setter
-        def tipo(self, tipo):
-            self.__tipo = tipo
+        self.__data_inicio = data_inicio
+        self.__data_fim = data_fim
 
         @property
-        def capacidade(self):
-            return self.__capacidade 
+        def data_inicio(self):
+            return self.__data_inicio
 
-        @capacidade.setter
-        def capacidade(self, caapacidade):
-            self.__capacidade = capacidade
+        @data_inicio.setter
+        def data_inicio(self, data_inicio):
+            self.data_inicio = data_inicio
         
         @property
-        def empresa(self):
-            return self.__empresa
+        def data_fim(self):
+            return self.__data_fim
 
-        @empresa.setter
-        def empresa(self, empresa):
-            self.__empresa = empresa
-
+        @data_fim.setter
+        def data_fim(self, data_fim):
+            self.__data_fim = data_fim
