@@ -1,5 +1,5 @@
 
-Class Empresa_transporte:  
+class Empresa_transporte:  
 
     def __init__(self, nome_empresa, cnpj, telefone):
         self.__nome_empresa = nome_empresa
@@ -30,3 +30,4 @@ Class Empresa_transporte:
         @telefone.setter
         def telefone(self, telefone):
             self.__telefone = telefone
+
