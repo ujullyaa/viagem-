@@ -1,6 +1,6 @@
 
 
-Class Itinerario:
+class Itinerario:
     def __init__(self, data_inicio, data_fim):
 
         self.__data_inicio = data_inicio
@@ -21,3 +21,4 @@ Class Itinerario:
         @data_fim.setter
         def data_fim(self, data_fim):
             self.__data_fim = data_fim
+
