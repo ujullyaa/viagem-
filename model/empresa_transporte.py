@@ -6,28 +6,29 @@ class Empresa_transporte:
         self.__cnpj = cnpj
         self.__telefone = telefone
 
+    
+    @property
+    def nome_empresa(self):
+        return self.__nome_empresa
+
+    @nome_empresa.setter
+    def nome_empresa(self, nome_empresa):
+        self.__nome_empresa = nome_empresa
         
-        @property
-        def nome_empresa(self):
-            return self.__nome_empresa
+    @property
+    def cnpj(self):
+        return self.__cnpj
 
-        @nome_empresa.setter
-        def nome_empresa(self, nome_empresa):
-            self.__nome_empresa = nome_empresa
-            
-        @property
-        def cnpj(self):
-            return self.__cnpj
+    @cnpj.setter
+    def cnpj(self, cnpj):
+        self.__cnpj = cnpj
 
-        @cnpj.setter
-        def cnpj(self, cnpj):
-            self.__cnpj = cnpj
+    @property
+    def telefone(self):
+        return self.__telefone
 
-        @property
-        def telefone(self):
-            return self.__telefone
+    @telefone.setter
+    def telefone(self, telefone):
+        self.__telefone = telefone
 
-        @telefone.setter
-        def telefone(self, telefone):
-            self.__telefone = telefone
 
