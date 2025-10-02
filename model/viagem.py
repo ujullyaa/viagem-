@@ -1,4 +1,8 @@
-
+from Itinerario import *
+from Meio_transporte import *
+from Empresa_transporte import *
+from Pagamento import *
+from Pessoa import *
 
 class Viajem:
   
@@ -21,6 +25,7 @@ class Viajem:
     self.__status = ''
     self.__preco_base = preco_base
 
+  
   @property
   def itinerario(self):
     return self.__itinerario
@@ -106,3 +111,4 @@ class Viajem:
   def preco_base(self, preco_base):
     self.__preco_base = preco_base
   
+
