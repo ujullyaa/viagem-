@@ -23,6 +23,7 @@ class Controlador_Empresa_Transporte:
         self.__empresa_transporte.nome_empresa = nome
         self.__empresa_transporte.cnpj = cnpj
         self.__empresa_transporte.telefone = telefone
+        self.view_empresa_transporte.exibir_mensagem(f"Configuração salva para: {nome}")
 
     def exibir_informacoes(self):
 
@@ -31,9 +32,6 @@ class Controlador_Empresa_Transporte:
             "CNPJ": self.__empresa_transporte.cnpj,
             "Telefone": self.__empresa_transporte.telefone
         }
-        
-    def atualizar_informacoes(self, nome, cnpj, telefone):
+        self.view_empresa_transporte.mostrar_detalhes_empresa(dados)
 
-        self.__empresa_transporte.nome_empresa = nome
-        self.__empresa_transporte.cnpj = cnpj
-        self.__empresa_transporte.telefone = telefone
+
