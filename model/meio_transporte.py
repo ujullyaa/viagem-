@@ -1,6 +1,6 @@
 
 
-Class Meio_transporte:
+class Meio_transporte:
     def __init__(self, tipo, capacidade, empresa_transporte):
 
         self.__tipo = tipo
@@ -30,4 +30,3 @@ Class Meio_transporte:
         @empresa.setter
         def empresa(self, empresa):
             self.__empresa = empresa
-
