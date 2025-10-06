@@ -1,5 +1,4 @@
-from empresa_transporte import Empresa_transporte
-from view_empresa_transporte import View_empresa_transporte
+from model.empresa_transporte import Empresa_transporte
 
 
 class Controlador_Empresa_Transporte:
