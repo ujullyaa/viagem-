@@ -24,6 +24,7 @@ class Viajem:
     self.__data_chegada = data_chegada
     self.__status = status
     self.__preco_base = preco_base
+    self.__passagens = []
 
   
   @property
@@ -111,4 +112,46 @@ class Viajem:
   def preco_base(self, preco_base):
     self.__preco_base = preco_base
   
+  def reservar_passagem(self, passageiro: Pessoa, assento: str) -> dict or None:
+    
+    if not self.verificar_disponibilidade():
+        return None 
+        
+    passagem_codigo = f"{self.__codigo}-{len(self.__passagens) + 1}"
+    nova_passagem = {"codigo": passagem_codigo, "passageiro": passageiro, "assento": assento, "status": "Confirmada"} 
+    self.__passagens.append(nova_passagem)
+    
+    return nova_passagem
+
+  def cancelar_passagem(self, numero_passagem: str) -> bool:
+ 
+    for i, passagem in enumerate(self.__passagens):
+        if passagem.get("codigo") == numero_passagem: 
+            del self.__passagens[i] 
+            return True
+    return False
+
+  def listar_passagens(self) -> list:
+
+    return self.__passagens
+
+  def calcular_preco(self, passageiro: Pessoa) -> float:
+
+    preco_final = self.__preco_base
+
+    return preco_final
+
+  def atualizar_status(self, novo_status: str):
+
+    self.status = novo_status 
+
+  def transporte(self, novo_meio: Meio_transporte):
+
+    self.meio_transporte = novo_meio
+
+  def atualizar_datas(self, nova_partida: str, nova_chegada: str):
+
+    self.data_partida = nova_partida 
+    self.data_chegada = nova_chegada 
+
 
