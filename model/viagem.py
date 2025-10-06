@@ -16,13 +16,13 @@ class Viajem:
       self.__empresa_transporte = empresa_transporte
     if (isinstance(pagamento, Pagamento)):
       self.__pagamento = pagamento
-    if (isinstance(passageiro, Passageiro)):
-      self.__passageiro = pessoa
+    if (isinstance(passageiro, Pessoa)):
+      self.__passageiro = passageiro
 
     self.__codigo = codigo
     self.__data_partida = data_partida
     self.__data_chegada = data_chegada
-    self.__status = ''
+    self.__status = status
     self.__preco_base = preco_base
 
   
@@ -69,7 +69,7 @@ class Viajem:
   @passageiro.setter
   def passageiro(self, passageiro: Pessoa):
     if (isinstance(passageiro, Pessoa)):
-      self.__passageiro = pessoa
+      self.__passageiro = passageiro
       
   @property
   def codigo(self):
