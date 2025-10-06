@@ -7,7 +7,6 @@ class Meio_transporte:
         self.__capacidade = capacidade
         self.__empresa_transporte = empresa_transporte
 
-
     @property
     def tipo(self):
         return self.__tipo
@@ -18,16 +17,16 @@ class Meio_transporte:
 
     @property
     def capacidade(self):
-        return self.__capacidade 
+        return self.__capacidade
 
     @capacidade.setter
     def capacidade(self, capacidade):
-            self.__capacidade = capacidade
-        
+        self.__capacidade = capacidade
+
     @property
     def empresa(self):
-            return self.__empresa
+        return self.__empresa_transporte
 
-    @__empresa_transporte.setter
-    def empresa(self, empresa):
-            self.__empresa_transporte = empresa_transporte
+    @empresa.setter
+    def empresa(self, empresa_transporte):
+        self.__empresa_transporte = empresa_transporte
