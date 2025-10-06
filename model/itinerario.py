@@ -1,4 +1,4 @@
-from passagem import Passagem
+from Passagem import passagem
 
 class Itinerario:
     def __init__(self, origem: str, destino: str, data_inicio: str, data_fim: str, passagem: Passagem):
@@ -48,6 +48,7 @@ class Itinerario:
 
     def validar_datas(self):
         return self.__data_inicio <= self.__data_fim
+
 
 
 
