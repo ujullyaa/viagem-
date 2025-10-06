@@ -1,4 +1,4 @@
-from empresa_transporte import Empresa_transporte
+from Empresa_transporte import empresa_transporte
 
 Class Meio_transporte:
     def __init__(self, tipo, capacidade, empresa_transporte):
@@ -31,6 +31,7 @@ Class Meio_transporte:
     @empresa.setter
     def empresa_transporte(self, empresa_transporte):
         self.__empresa = empresa
+
 
 
 
