@@ -3,7 +3,7 @@ class Empresa_transporte:
 
     def __init__(self, nome_empresa, cnpj, telefone):
         
-        self.__nome_empresa = []
+        self.__nome_empresa = nome_empresa
         self.__cnpj = cnpj
         self.__telefone = telefone
 
@@ -31,6 +31,7 @@ class Empresa_transporte:
     @telefone.setter
     def telefone(self, telefone):
         self.__telefone = telefone
+
 
 
 
