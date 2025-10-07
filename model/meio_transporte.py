@@ -1,7 +1,7 @@
 
 
 class Meio_transporte:
-    def __init__(self, tipo: str, capacidade: int, empresas_transporte: list):
+    def __init__(self, tipo: str, capacidade: int, empresas_transporte: str):
 
         self.__tipo = tipo
         self.__capacidade = capacidade
@@ -30,4 +30,5 @@ class Meio_transporte:
     @empresa.setter
     def empresa(self, empresa_transporte):
         self.__empresa_transporte = empresa_transporte
+
 
