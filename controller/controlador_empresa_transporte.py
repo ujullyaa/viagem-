@@ -9,7 +9,7 @@ class Controlador_Empresa_Transporte:
         self.__tela_empresa_transporte = tela_empresa_transporte
 
     @property
-    def empresa_transporte(self):
+    def empresas_transporte(self):
         return self.__empresas_transporte
 
     @property
@@ -18,20 +18,21 @@ class Controlador_Empresa_Transporte:
 
     def salvar_configuracao(self, nome, cnpj, telefone):
 
-        self.__empresa_transporte.nome_empresa = nome
-        self.__empresa_transporte.cnpj = cnpj
-        self.__empresa_transporte.telefone = telefone
+        self.__empresas_transporte.nome_empresa = nome
+        self.__empresas_transporte.cnpj = cnpj
+        self.__empresas_transporte.telefone = telefone
         self.__tela_empresa_transporte.exibir_mensagem(
             f"Configuração salva para: {nome}")
 
     def exibir_informacoes(self):
 
         dados = {
-            "Nome": self.__empresa_transporte.nome_empresa,
-            "CNPJ": self.__empresa_transporte.cnpj,
-            "Telefone": self.__empresa_transporte.telefone
+            "Nome": self.__empresas_transporte.nome_empresa,
+            "CNPJ": self.__empresas_transporte.cnpj,
+            "Telefone": self.__empresas_transporte.telefone
         }
         self.__tela_empresa_transporte.mostrar_detalhes_empresa(dados)
+
 
 
 
