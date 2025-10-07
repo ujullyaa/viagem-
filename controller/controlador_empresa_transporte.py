@@ -13,8 +13,8 @@ class Controlador_Empresa_Transporte:
         return self.__empresas_transporte
 
     @property
-    def view_empresa_transporte(self):
-        return self.__Tela_empresa_transporte
+    def tela_empresa_transporte(self):
+        return self.__tela_empresa_transporte
 
     def salvar_configuracao(self, nome, cnpj, telefone):
 
@@ -32,6 +32,7 @@ class Controlador_Empresa_Transporte:
             "Telefone": self.__empresas_transporte.telefone
         }
         self.__tela_empresa_transporte.mostrar_detalhes_empresa(dados)
+
 
 
 
