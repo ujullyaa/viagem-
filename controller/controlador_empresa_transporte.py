@@ -3,7 +3,7 @@ from model.empresa_transporte import Empresa_transporte
 
 class Controlador_Empresa_Transporte:
 
-    def __init__(self, empresa_transporte: Empresa_transporte, view_empresa_transporte: View_empresa_transporte):
+    def __init__(self, empresa_transportes: list, view_empresa_transporte: View_empresa_transporte):
 
         self.__empresa_transporte = empresa_transporte
         self.__view_empresa_transporte = view_empresa_transporte
@@ -32,3 +32,4 @@ class Controlador_Empresa_Transporte:
             "Telefone": self.__empresa_transporte.telefone
         }
         self.view_empresa_transporte.mostrar_detalhes_empresa(dados)
+
