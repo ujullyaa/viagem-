@@ -5,7 +5,7 @@ class Controlador_Empresa_Transporte:
 
     def __init__(self, empresas_transporte: list, tela_empresa_transporte: Tela_empresa_transporte):
 
-        self.__empresas_transporte = empresa_transporte
+        self.__empresas_transporte = []
         self.__tela_empresa_transporte = tela_empresa_transporte
 
     @property
@@ -32,5 +32,6 @@ class Controlador_Empresa_Transporte:
             "Telefone": self.__empresa_transporte.telefone
         }
         self.__tela_empresa_transporte.mostrar_detalhes_empresa(dados)
+
 
 
