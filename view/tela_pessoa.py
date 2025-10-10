@@ -1,8 +1,6 @@
 from controller.controlador_pessoa import ControladorPessoa
 from model.pessoa import Pessoa
 
-
-
 class TelaPessoa:
     def tela_opcoes(self):
         print("----- PESSOAS -----")
