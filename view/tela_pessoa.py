@@ -1,74 +1,44 @@
 from controller.controlador_pessoa import ControladorPessoa
 from model.pessoa import Pessoa
-import os
-import time
+
 
 
 class TelaPessoa:
-    def __init__(self):
-        self.__controlador = ControladorPessoa
-
-    def limpar_tela(self):
-        os.system('clear')
-
-    def mostrar_titulo(self, titulo):
-        print("=" * 40)
-        print(f"{titulo.center(40)}")
-        print("=" * 40)
-
-    def exibir_pessoas(self):
-        self.limpar_tela()
-        self.mostrar_titulo("LISTA DE PESSAOS")
-        pessoas = self.__controlador.listar_pessoas()
-        if not pessoas:
-            print("Nenhuma pessoa cadastrada.")
-        else:
-            for p in pessoas:
-                print(f"Nome: {p.nome}")
-                print(f"Idade: {p.idade}")
-                print(f"CPF: {p.cpf}")
-                print(f"Telefone: {p.telefone}")
-                print("-" * 40)
-
-        input("\nPresisone Enter para voltar ao menu...")
-
-    def cadastrar_pessoa(self):
-        self.limpar_tela()
-        self.mostrar_titulo("CADASTRAR PESSOA")
+    def tela_opcoes(self):
+        print("----- PESSOAS -----")
+        print("1. Incluir Pessoa")
+        print("2. Alterar Pessoas")
+        print("3. Listar Pessoa")
+        print("4. Excluir Pessoa")
+        print("0. Retornar")
+        
+        while True:
+            try:
+             opcao = int(input("Escolha uma opção: "))
+             if opcao in [0, 1, 2, 3, 4]:
+                 return opcao
+             else:
+                 print("Opção inválida. Tente novamente.")
+            except ValueError:
+                print("Entrada inválida. Digite um número.")
+    def pega_dados_pessoa(self):
+        print("----- DADOS DA PESSOA -----")
         nome = input("Nome: ")
-        idade = int(input("Idade: "))
+        idade = input("Idade: ")
         cpf = input("CPF: ")
         telefone = input("Telefone: ")
-        try:
-            self.__controlador.incluir_pessoa(nome, idade, cpf, telefone)
-            print("\nPessoa cadastrada com sucesso!")
-        except ValueError as e:
-            print(f"\n erro ao cadastrar pessoa: {e}")
-        time.sleep(2)
+        return {"nome": nome, "idade": idade, "cpf": cpf, "telefone": telefone}
+    
+    def mostra_pessoas(self, dados_pessoas):
+        print("NOME:", dados_pessoas["nome"])
+        print("IDADE:", dados_pessoas["idade"])
+        print("CPF:", dados_pessoas["cpf"])
+        print("TELEFONE:", dados_pessoas["telefone"])
+        print("-------------------------")
 
-    def menu(self):
-        while True:
-            self.limpar_tela()
-            self.mostrar_titulo("MENU PESSOA")
-            print("1- Cadastrar Pessoa")
-            print("2- Listar Pessoas")
-            print("0- Sair")
-            print("=" * 40)
-
-            opcao = input("Escolha uma opcao: ")
-
-            if opcao == "1":
-                self.cadastrar_pessoa()
-            elif opcao == "2":
-                self.exibir_pessoas()
-            elif opcao == "0":
-                print("\nVoltando ao menu principal...")
-                time.sleep(1)
-                break
-            else:
-                print("\nOpcao invalida! Tente novamente.")
-                time.sleep(1)
-
-
-if __name__ == "__main__":
-    TelaPessoa().menu()
+    def seleciona_pessoa(self):
+        cpf = input("Digite o CPF da pessoa: ")
+        return cpf
+    
+    def mostra_mensagem(self, msg):
+        print(msg)
