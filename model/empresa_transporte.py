@@ -1,5 +1,5 @@
 
-class Empresa_transporte:  
+class EmpresaTransporte:  
 
     def __init__(self, nome_empresa, cnpj, telefone):
         

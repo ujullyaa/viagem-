@@ -1,11 +1,11 @@
-
+from empresa_transporte import EmpresaTransporte
 
 class Meio_transporte:
     def __init__(self, tipo: str, capacidade: int, empresas_transporte: str):
 
         self.__tipo = tipo
         self.__capacidade = capacidade
-        self.__empresa_transporte = empresa_transporte
+        self.__empresa_transporte = []
 
     @property
     def tipo(self):
