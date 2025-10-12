@@ -2,6 +2,7 @@ from model.pessoa import Pessoa
 from view.tela_pessoa import TelaPessoa
 from controller import controlador_controladores
 
+
 class ControladorPessoa:
     def __init__(self):
         self.__pessoas = []
@@ -13,7 +14,7 @@ class ControladorPessoa:
             if pessoa.cpf == cpf:
                 return pessoa
         return None
-    
+
     def incluir_pessoa(self):
         dados = self.__tela_pessoa.pega_dados_pessoa()
         if self.__pega_pessoa_por_cpf(dados["cpf"]) is None:
@@ -21,7 +22,8 @@ class ControladorPessoa:
         else:
             pessoa = Pessoa(dados["nome"], dados["cpf"], dados["telefone"])
             self.__pessoas.append(pessoa)
-            self.__tela_pessoa.mostra_mensagem("Pessoa cadastrada com sucesso!")
+            self.__tela_pessoa.mostra_mensagem(
+                "Pessoa cadastrada com sucesso!")
 
     def alterar_pessoa(self):
         self.__listar_pessoas()
@@ -46,8 +48,9 @@ class ControladorPessoa:
                     "nome": pessoa.nome,
                     "idade": pessoa.idade,
                     "cpf": pessoa.cpf,
-                    "telefone":pessoa.telefone
+                    "telefone": pessoa.telefone
                 })
+
     def excluir_pessoa(self):
         self.__listar_pessoas()
         cpf = self.__tela_pessoa.seleciona_pessoa()
@@ -56,7 +59,7 @@ class ControladorPessoa:
         if pessoa is not None:
             self.__pessoas.remove(pessoa)
             self.__tela_pessoa.mostra_mensagem("Pessoa excluída com sucesso!")
-        else: 
+        else:
             self.__tela_pessoa.mostra_mensagem("Pessoa não encontrada.")
 
     def retornar(self):
