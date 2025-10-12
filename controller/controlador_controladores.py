@@ -1,11 +1,11 @@
+from controller.controlador_empresa_transporte import ControladorEmpresaTransporte
+from controller.controlador_itinerario import ControladorItinerario
+from controller.controlador_meio_transporte import ControladorMeioTransporte
+from controller.controlador_passagem import ControladorPassagem
+from controller.controlador_pessoa import ControladorPessoa
+from controller.controlador_viagem import ControladorViagem
+from controller.controlador_pagamento import ControladorPagamento
 from view.tela_controladores import TelaControladores
-from controlador_empresa_transporte import ControladorEmpresaTransporte
-from controlador_itinerario import ControladorItinerario
-from controlador_meio_transporte import ControladorMeioTransporte
-from controlador_passagem import ControladorPassagem
-from controlador_viagem import ControladorViagem
-from controlador_pessoa import ControladorPessoa
-from controlador_pagamento import ControladorPagamento
 
 
 class ControladorControladores:
