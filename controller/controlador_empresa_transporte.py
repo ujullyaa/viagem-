@@ -25,6 +25,20 @@ class ControladorEmpresaTransporte():
             if(empresa_transporte.cnpj == cnpj):
                 return empresa_transporte
         return None
+    
+    def alterar_empresa(self):
+        self.lista_empresa()
+        cnpj_empresa = self.__tela_empresa_transporte.seleciona_empresa()
+        empresa = self.pega_empresa_por_cnpj(cnpj_empresa)
+
+        if(empresa is not None):
+            novos_dados_amigo = self.__tela_amigo.pega_dados_amigo()
+            empresa novos_dados_["nome"]
+            amigo.telefone = novos_dados_amigo["telefone"]
+            amigo.cpf = novos_dados_amigo["cpf"]
+            self.lista_amigos()
+        else:
+            self.__tela_amigo.mostra_mensagem("ATENCAO: Amigo não existente")
 
     def excluir_empresa(self):
         self.lista_empresa()
