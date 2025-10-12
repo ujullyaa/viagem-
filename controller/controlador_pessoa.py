@@ -1,10 +1,10 @@
 from model.pessoa import Pessoa
 from view.tela_pessoa import TelaPessoa
-from controller import controlador_controladores
+from controlador_controladores import controlador_controladores
 
 
 class ControladorPessoa:
-    def __init__(self):
+    def __init__(self, controlador_controladores):
         self.__pessoas = []
         self.__tela_pessoa = TelaPessoa()
         self.__controlador_controladores = controlador_controladores
