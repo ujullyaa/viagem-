@@ -1,14 +1,14 @@
-from itinerario import Itinerario
-from meio_transporte import Meio_transporte
-from empresa_transporte import Empresa_transporte
-from pagamento import Pagamento
-from pessoa import Pessoa
+from model.itinerario import Itinerario
+from model.meio_transporte import MeioTransporte
+from model.empresa_transporte import EmpresaTransporte
+from model.pagamento import Pagamento
+from model.pessoa import Pessoa
 from typing import Optional
 
 
 class Viajem:
 
-    def __init__(self, codigo: str, itinerario: Itinerario, data_partida: str, data_chegada: str, meio_transporte: Meio_transporte, empresa_transporte: Empresa_transporte, status: str, preco_base: float, pagamento: Pagamento, passageiro: Pessoa):
+    def __init__(self, codigo: str, itinerario: Itinerario, data_partida: str, data_chegada: str, meio_transporte: MeioTransporte, empresa_transporte: EmpresaTransporte, status: str, preco_base: float, pagamento: Pagamento, passageiro: Pessoa):
 
         if (isinstance(itinerario, Itinerario)):
             self.__itinerario = itinerario

@@ -24,12 +24,12 @@ class ControladorMeioTransporte:
         self.__tela_meio_transporte.mostra_mensagem(" Meio de transporte cadastrado com sucesso!")
 
     def lista_meios_transporte(self):
-         for meio_transporte in self.__meios_transporte:
+        for meio_transporte in self.__meios_transporte:
             self.__tela_meio_transporte.mostra_meio({"tipo": meio_transporte.tipo, "capacidade": meio_transporte.capacidade, "empresa": meio_transporte.empresa})
 
     def excluir_meio_transporte(self):
         self.lista_meios_transporte()
-        tipo_meio = self.__tela_amigo.seleciona_amigo()
+        tipo_meio = self.__tela_meio_transporte.seleciona_meio_transporte()
         tipo = self.pega_meio_por_tipo(tipo_meio)
 
         if(tipo is not None):
@@ -56,7 +56,9 @@ class ControladorMeioTransporte:
 
 
     def abre_tela(self):
-        lista_opcoes = {1: self.incluir_meio_transporte, 2: self.listar_meios_transporte, 3: self.alterar_meio_transporte , 4: self.excluir_meio_transporte, 0: self.retornar}
+        lista_opcoes = {1: self.incluir_meio_transporte, 2: self.listar_meios_transporte, 
+                        3: self.alterar_meio_transporte , 4: self.excluir_meio_transporte, 
+                        0: self.retornar}
 
         continua = True
 

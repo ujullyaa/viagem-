@@ -9,10 +9,13 @@ class TelaEmpresaTransporte():
         print("3 - Excluir Empresa")
         print("0 - Retornar")
 
-        opcao = int(input("Escolha a opcao: "))
+        try:
+            opcao = int(input("Escolha a opção: "))
+        except ValueError:
+            print(" Digite um número válido!")
+            opcao = -1
         return opcao
 
-  
     def pega_dados_empresa(self):
         print("-------- DADOS EMPRESA ----------")
         nome_empresa = input("Nome Empresa: ")
@@ -21,13 +24,11 @@ class TelaEmpresaTransporte():
 
         return {"nome empresa": nome_empresa, "telefone": telefone, "cnpj": cnpj}
 
-
     def mostra_empresa(self, dados_empresa):
         print("NOME DA EMPRESA: ", dados_empresa["nome empresa"])
         print("TEFONE DA EMPRESA: ", dados_empresa["telefone"])
         print("CNPJ DA EMPRESA: ", dados_empresa["cnpj"])
         print("\n")
-
 
     def seleciona_empresa(self):
         cnpj = input("CNPJ da empresa que deseja selecionar: ")

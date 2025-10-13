@@ -1,6 +1,6 @@
-from empresa_transporte import EmpresaTransporte
+from model.empresa_transporte import EmpresaTransporte
 
-class Meio_transporte:
+class MeioTransporte:
     def __init__(self, tipo: str, capacidade: int, empresas_transporte: str):
 
         self.__tipo = tipo

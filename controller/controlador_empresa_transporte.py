@@ -13,13 +13,13 @@ class ControladorEmpresaTransporte():
     def incluir_empresa(self):
         dados_empresa = self.__tela_empresa_transporte.pega_dados_empresa()
         empresa = EmpresaTransporte(
-            dados_empresa["nome empresa"], dados_empresa["telefone"], dados_empresa["cnpj"])
+            dados_empresa["nome_empresa"], dados_empresa["telefone"], dados_empresa["cnpj"])
         self.__empresas_transporte.append(empresa)
 
     def lista_empresa(self):
         for empresa_transporte in self.__empresas_transporte:
             self.__tela_empresa_transporte.mostra_empresa(
-                {"nome": empresa_transporte.nome_empresa, "telefone": empresa_transporte.telefone, "cnpj": empresa_transporte.cnpj})
+                {"nome_empresa": empresa_transporte.nome_empresa, "telefone": empresa_transporte.telefone, "cnpj": empresa_transporte.cnpj})
 
     def pega_empresa_por_cnpj(self, cnpj: int):
         for empresa_transporte in self.__empresas_transporte:
@@ -34,7 +34,7 @@ class ControladorEmpresaTransporte():
 
         if (empresa is not None):
             novos_dados_empresa = self.__tela_empresa_transporte.pega_dados_empresa()
-            empresa.nome_empresa = novos_dados_empresa["nome empresa"]
+            empresa.nome_empresa = novos_dados_empresa["nome_empresa"]
             empresa.telefone = novos_dados_empresa["telefone"]
             empresa.cnpj = novos_dados_empresa["cnpj"]
             self.lista_empresa()

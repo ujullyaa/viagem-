@@ -1,20 +1,27 @@
-from Passagem import passagem
+from model.passagem import Passagem  
 
 class Itinerario:
-    def __init__(self, origem: str, destino: str, data_inicio: str, data_fim: str, passagem: Passagem):
-
+    def __init__(self, codigo_itinerario: int, origem: str, destino: str, data_inicio: str, data_fim: str, passagem: list = None):
+        self.__codigo_itinerario = codigo_itinerario
         self.__origem = origem
         self.__destino = destino
         self.__data_inicio = data_inicio
         self.__data_fim = data_fim
-        self.__passagem = []
+        self.__passagem = passagem if passagem is not None else []
 
+    @property
+    def codigo_itinerario(self):
+        return self.__codigo_itinerario
+
+    @codigo_itinerario.setter
+    def codigo_itinerario(self, codigo_itinerario):
+        self.__codigo_itinerario = codigo_itinerario
 
     @property
     def origem(self):
         return self.__origem
 
-    @cidade.setter
+    @origem.setter
     def origem(self, origem):
         self.__origem = origem
 
@@ -22,7 +29,7 @@ class Itinerario:
     def destino(self):
         return self.__destino
 
-    @pais.setter
+    @destino.setter
     def destino(self, destino):
         self.__destino = destino
         
@@ -48,9 +55,3 @@ class Itinerario:
 
     def validar_datas(self):
         return self.__data_inicio <= self.__data_fim
-
-
-
-
-
-

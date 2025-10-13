@@ -1,7 +1,7 @@
 
 class EmpresaTransporte:  
 
-    def __init__(self, nome_empresa, cnpj, telefone):
+    def __init__(self, nome_empresa: str, cnpj: int, telefone: int ):
         
         self.__nome_empresa = nome_empresa
         self.__cnpj = cnpj
