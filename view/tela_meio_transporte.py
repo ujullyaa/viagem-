@@ -1,5 +1,4 @@
 
-
 class TelaMeioTransporte:
 
     def tela_opcoes(self):
@@ -44,3 +43,4 @@ class TelaMeioTransporte:
         print("----- Selecionar Meio de Transporte -----")
         tipo = input("Digite o tipo do meio de transporte: ")
         return tipo
+

@@ -1,5 +1,4 @@
 
-
 class TelaEmpresaTransporte():
 
     def tela_opcoes(self):
@@ -37,3 +36,4 @@ class TelaEmpresaTransporte():
 
     def mostra_mensagem(self, msg):
         print(msg)
+

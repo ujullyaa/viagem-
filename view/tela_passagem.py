@@ -1,5 +1,4 @@
 
-
 class TelaPassagem:
     def tela_opcoes(self):
         print("-------- Passagem ----------")

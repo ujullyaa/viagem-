@@ -66,3 +66,4 @@ class ControladorEmpresaTransporte:
                 funcao()
             else:
                 self.__tela_empresa.mostra_mensagem("Opção inválida.")
+
