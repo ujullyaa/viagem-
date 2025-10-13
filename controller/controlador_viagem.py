@@ -9,14 +9,12 @@ class ControladorViagem:
         self.__tela_viagem = TelaViagem()
         self.__controlador_controladores = controlador_controladores
 
-    # Método para buscar viagem por código
     def pega_viagem_por_codigo(self, codigo: int):
         for viagem in self.__viagens:
             if viagem.codigo == codigo:
                 return viagem
         return None
 
-    # Inclusão de viagem
     def incluir_viagem(self):
         dados_viagem = self.__tela_viagem.pega_dados_viagem()
 
@@ -24,7 +22,6 @@ class ControladorViagem:
             self.__tela_viagem.mostra_mensagem("Viagem já existente!")
             return
 
-        # Busca a pessoa pelo CPF informado
         cpf = dados_viagem["pessoa"]
         pessoa = self.__controlador_controladores.controlador_pessoa.pega_pessoa_por_cpf(
             cpf)
@@ -47,7 +44,6 @@ class ControladorViagem:
         self.__viagens.append(nova_viagem)
         self.__tela_viagem.mostra_mensagem("Viagem cadastrada com sucesso!")
 
-    # Listagem de viagens
     def listar_viagens(self):
         if not self.__viagens:
             self.__tela_viagem.mostra_mensagem("Nenhuma viagem cadastrada.")
@@ -65,7 +61,6 @@ class ControladorViagem:
                 "pessoa": viagem.pessoa.nome
             })
 
-    # Reservar viagem
     def reservar_viagem(self):
         self.listar_viagens()
         codigo = self.__tela_viagem.seleciona_viagem()
@@ -87,7 +82,6 @@ class ControladorViagem:
         else:
             self.__tela_viagem.mostra_mensagem("Falha ao reservar passagem.")
 
-    # Cancelar viagem
     def cancelar_viagem(self):
         codigo = self.__tela_viagem.seleciona_viagem()
         viagem = self.pega_viagem_por_codigo(codigo)
@@ -103,7 +97,6 @@ class ControladorViagem:
         else:
             self.__tela_viagem.mostra_mensagem("Falha ao cancelar passagem.")
 
-    # Atualizar status da viagem
     def atualizar_viagem(self):
         codigo = self.__tela_viagem.seleciona_viagem()
         viagem = self.pega_viagem_por_codigo(codigo)
@@ -116,7 +109,6 @@ class ControladorViagem:
         else:
             self.__tela_viagem.mostra_mensagem("Viagem não encontrada.")
 
-    # Excluir viagem
     def excluir_viagem(self):
         codigo = self.__tela_viagem.seleciona_viagem()
         viagem = self.pega_viagem_por_codigo(codigo)
@@ -127,11 +119,9 @@ class ControladorViagem:
         else:
             self.__tela_viagem.mostra_mensagem("Viagem não encontrada.")
 
-    # Retornar ao menu principal
     def retornar(self):
         self.__controlador_controladores.inicializa_sistema()
 
-    # Menu de opções
     def abre_tela(self):
         opcoes = {
             1: self.incluir_viagem,
