@@ -1,10 +1,13 @@
 class TelaPagamento:
     def __init__(self):
         print(" ----- PAGAMENTO ----- ")
-        print("1 - incluir pagamento")
-        print("2 - listar pagamentos")
-        print("3 - excluir pagamento")
-        print("0 - retornar")
+
+    def tela_opcoes(self):
+        print("\nEscolha uma das opções abaixo:")
+        print("1 - Incluir pagamento")
+        print("2 - Listar pagamentos")
+        print("3 - Excluir pagamento")
+        print("0 - Retornar")
 
         while True:
             try:
@@ -33,7 +36,7 @@ class TelaPagamento:
             except ValueError:
                 print("Entrada inválida. Digite um número.")
 
-    def pega_dados_pagamentos(self):
+    def pega_dados_pagamento(self):
         print("\n --- NOVO PAGAMENTO --- ")
         cpf_passageiro = input("CPF do passageiro: ")
         valor_total = float(input("Valor total: "))
@@ -48,7 +51,7 @@ class TelaPagamento:
             "forma_pagamento": forma_pagamento
         }
 
-    def paga_dados_cartao(self):
+    def pega_dados_cartao(self):
         print("\n --- DADOS CARTÃO --- ")
         numero_cartao = input("Número do cartão: ")
         nome_titular = input("Nome do titular: ")
@@ -83,5 +86,9 @@ class TelaPagamento:
         print(msg)
 
     def seleciona_pagamento(self):
-        codigo = int(input("Digite o código do pagamento: "))
-        return codigo
+        while True:
+            try:
+                codigo = int(input("Digite o código do pagamento: "))
+                return codigo
+            except ValueError:
+                print("Entrada inválida. Digite um número.")

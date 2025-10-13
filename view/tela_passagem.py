@@ -1,3 +1,5 @@
+
+
 class TelaPassagem:
     def tela_opcoes(self):
         print("-------- Passagem ----------")
@@ -33,7 +35,8 @@ class TelaPassagem:
 
         pessoa = input("Nome do Passageiro: ")
         pagamento = input("Forma de Pagamento (cartão/dinheiro/pix): ")
-        meio_transporte = input("Tipo de Meio de Transporte (ônibus/avião/navio): ")
+        meio_transporte = input(
+            "Tipo de Meio de Transporte (ônibus/avião/navio): ")
 
         return {
             "numero": numero,

@@ -1,6 +1,5 @@
 from model.pessoa import Pessoa
 from view.tela_pessoa import TelaPessoa
-from controlador_controladores import controlador_controladores
 
 
 class ControladorPessoa:

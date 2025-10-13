@@ -1,6 +1,7 @@
 
+
 class TelaEmpresaTransporte():
-    
+
     def tela_opcoes(self):
         print("-------- EMPRESAS ----------")
         print("Escolha a opcao")
@@ -22,10 +23,10 @@ class TelaEmpresaTransporte():
         telefone = input("Telefone: ")
         cnpj = input("CNPJ: ")
 
-        return {"nome empresa": nome_empresa, "telefone": telefone, "cnpj": cnpj}
+        return {"nome_empresa": nome_empresa, "telefone": telefone, "cnpj": cnpj}
 
     def mostra_empresa(self, dados_empresa):
-        print("NOME DA EMPRESA: ", dados_empresa["nome empresa"])
+        print("NOME DA EMPRESA: ", dados_empresa["nome_empresa"])
         print("TEFONE DA EMPRESA: ", dados_empresa["telefone"])
         print("CNPJ DA EMPRESA: ", dados_empresa["cnpj"])
         print("\n")

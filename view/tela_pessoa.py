@@ -1,5 +1,3 @@
-from controller.controlador_pessoa import ControladorPessoa
-from model.pessoa import Pessoa
 
 
 class TelaPessoa:

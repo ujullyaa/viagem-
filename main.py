@@ -1,6 +1,5 @@
-from controller.controlador_controladores import controlador_controladores
+from controller.controlador_controladores import ControladorControladores
 
 if __name__ == "__main__":
-    sistema = controlador_controladores
+    sistema = ControladorControladores()
     sistema.inicializa_sistema()
-    

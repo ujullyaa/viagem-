@@ -6,15 +6,15 @@ from model.pessoa import Pessoa
 from typing import Optional
 
 
-class Viajem:
+class Viagem:
 
     def __init__(self, codigo: str, itinerario: Itinerario, data_partida: str, data_chegada: str, meio_transporte: MeioTransporte, empresa_transporte: EmpresaTransporte, status: str, preco_base: float, pagamento: Pagamento, passageiro: Pessoa):
 
         if (isinstance(itinerario, Itinerario)):
             self.__itinerario = itinerario
-        if (isinstance(meio_transporte, Meio_transporte)):
+        if (isinstance(meio_transporte, MeioTransporte)):
             self.__meio_transporte = meio_transporte
-        if (isinstance(empresa_transporte, Empresa_transporte)):
+        if (isinstance(empresa_transporte, EmpresaTransporte)):
             self.__empresa_transporte = empresa_transporte
         if (isinstance(pagamento, Pagamento)):
             self.__pagamento = pagamento
@@ -42,8 +42,8 @@ class Viajem:
         return self.__meio_transporte
 
     @meio_transporte.setter
-    def meio_transporte(self, meio_transporte: Meio_transporte):
-        if (isinstance(meio_transporte, Meio_transporte)):
+    def meio_transporte(self, meio_transporte: MeioTransporte):
+        if (isinstance(meio_transporte, MeioTransporte)):
             self.__meio_transporte = meio_transporte
 
     @property
@@ -51,8 +51,8 @@ class Viajem:
         return self.__empresa_transporte
 
     @empresa_transporte.setter
-    def empresa_transporte(self, empresa_transporte: Empresa_transporte):
-        if (isinstance(empresa_transporte, Empresa_transporte)):
+    def empresa_transporte(self, empresa_transporte: EmpresaTransporte):
+        if (isinstance(empresa_transporte, EmpresaTransporte)):
             self.__empresa_transporte = empresa_transporte
 
     @property
@@ -150,7 +150,7 @@ class Viajem:
 
         self.status = novo_status
 
-    def transporte(self, novo_meio: Meio_transporte):
+    def transporte(self, novo_meio: MeioTransporte):
 
         self.meio_transporte = novo_meio
 

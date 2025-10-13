@@ -26,7 +26,7 @@ class ControladorViagem():
             self.__tela_viagem.mostra_mensagem("Viagem ja existente!")
             return
 
-        Viagem = Viagem(
+        nova_viagem = Viagem(
             codigo=dados_viagem["codigo"],
             data_partida=dados_viagem["data_partida"],
             data_chegada=dados_viagem["data_chegada"],
@@ -68,7 +68,8 @@ class ControladorViagem():
 
         passageiro = input("Nome do passageiro: ")
         assento = input("Número do assento: ")
-        reserva = viagem.reservar_viagem(passageiro, assento)
+        reserva = viagem.reservar_passagem(
+            Pessoa(passageiro, idade=0), assento)
         if reserva:
             self.__tela_viagem.mostra_mensagem(
                 "Reserva realizada com sucesso!")

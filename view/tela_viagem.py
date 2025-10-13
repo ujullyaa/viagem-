@@ -1,5 +1,3 @@
-from controller.controlador_viagem import ControladorViagem
-from model.viagem import Viagem
 
 
 class TelaViagem:

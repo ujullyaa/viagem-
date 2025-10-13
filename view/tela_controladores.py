@@ -2,6 +2,8 @@ class TelaControladores:
     def __init__(self):
         print("\nSistema de Gerenciamento de Viagens")
         print("Escolha uma das opções abaixo:")
+
+    def tela_opcoes(self):
         print("1. Empresa de Transporte")
         print("2. Itinerário")
         print("3. Meio de Transporte")
@@ -12,7 +14,8 @@ class TelaControladores:
         print("0. Sair do Sistema")
 
         try:
-            return int(input("Escolha uma opção: "))
+            opcao = int(input("Escolha uma opção: "))
         except ValueError:
             print("Entrada inválida. Digite um número.")
-            return -1
+            opcao = -1
+        return opcao

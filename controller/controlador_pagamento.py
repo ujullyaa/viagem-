@@ -1,5 +1,5 @@
 from view.tela_pagamento import TelaPagamento
-from model.pagamento import Cartao, Pix, Cedula
+from model.pagamento import Cartao, pix, Cedula
 from random import randint
 
 
@@ -45,7 +45,7 @@ class ControladorPagamento:
 
         elif forma_pagamento == "pix":
             dados_pix = self.__tela_pagamento.pega_dados_pix()
-            pagamento = Pix(
+            pagamento = pix(
                 forma_pagamento="pix",
                 pagou=pagou,
                 data=data,
@@ -111,13 +111,15 @@ class ControladorPagamento:
             1: self.incluir_pagamento,
             2: self.listar_pagamentos,
             3: self.excluir_pagamento,
-            0: self.retornar
+            0: lambda: None
         }
 
         while True:
             opcao = self.__tela_pagamento.tela_opcoes()
+            if opcao == 0:
+                break
             funcao_escolhida = opcoes.get(opcao)
             if funcao_escolhida:
                 funcao_escolhida()
             else:
-                break
+                self.__tela_pagamento.mostra_mensagem("Opção inválida.")
