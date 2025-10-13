@@ -4,6 +4,7 @@ from model.pessoa import Pessoa
 from model.pagamento import Pagamento
 from model.meio_transporte import MeioTransporte
 
+
 class ControladorPassagem:
     def __init__(self, controlador_controladores):
         self.__passagens = []
