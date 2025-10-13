@@ -1,9 +1,6 @@
 class TelaPagamento:
-    def __init__(self):
-        print(" ----- PAGAMENTO ----- ")
-
     def tela_opcoes(self):
-        print("\nEscolha uma das opções abaixo:")
+        print("\n===== PAGAMENTO =====")
         print("1 - Incluir pagamento")
         print("2 - Listar pagamentos")
         print("3 - Excluir pagamento")
@@ -37,11 +34,11 @@ class TelaPagamento:
                 print("Entrada inválida. Digite um número.")
 
     def pega_dados_pagamento(self):
-        print("\n --- NOVO PAGAMENTO --- ")
+        print("\n--- NOVO PAGAMENTO ---")
         cpf_passageiro = input("CPF do passageiro: ")
         valor_total = float(input("Valor total: "))
         data = input("Data (DD/MM/AAAA): ")
-        pagou = input("Pagamento efetuado? (s/n): ")
+        pagou = input("Pagamento efetuado? (s/n): ").lower() == 's'
         forma_pagamento = self.escolhe_tipo_pagamento()
         return {
             "cpf_passageiro": cpf_passageiro,
@@ -52,7 +49,7 @@ class TelaPagamento:
         }
 
     def pega_dados_cartao(self):
-        print("\n --- DADOS CARTÃO --- ")
+        print("\n--- DADOS CARTÃO ---")
         numero_cartao = input("Número do cartão: ")
         nome_titular = input("Nome do titular: ")
         validade = input("Validade (MM/AA): ")
@@ -65,7 +62,7 @@ class TelaPagamento:
         }
 
     def pega_dados_pix(self):
-        print("\n --- DADOS PIX --- ")
+        print("\n--- DADOS PIX ---")
         chave_pix = input("Chave Pix: ")
         banco = input("Banco: ")
         return {

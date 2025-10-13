@@ -16,25 +16,40 @@ class ControladorPessoa:
 
     def incluir_pessoa(self):
         dados = self.__tela_pessoa.pega_dados_pessoa()
-        if self.__pega_pessoa_por_cpf(dados["cpf"]) is None:
-            self.__tela_pessoa.mostra_mensagem("CPF cadastrado com sucesso!")
+        if dados:
+            if self.pega_pessoa_por_cpf(dados["cpf"]) is None:
+                pessoa = Pessoa(
+                    dados["nome"],
+                    dados["idade"],
+                    dados["cpf"],
+                    dados["telefone"]
+                )
+                self.__pessoas.append(pessoa)
+                self.__tela_pessoa.mostra_mensagem(
+                    "Pessoa cadastrada com sucesso!")
+            else:
+                self.__tela_pessoa.mostra_mensagem("CPF já cadastrado!")
         else:
-            pessoa = Pessoa(dados["nome"], dados["cpf"], dados["telefone"])
-            self.__pessoas.append(pessoa)
             self.__tela_pessoa.mostra_mensagem(
-                "Pessoa cadastrada com sucesso!")
+                "Dados inválidos. Cadastro cancelado.")
 
     def alterar_pessoa(self):
-        self.__listar_pessoas()
+        self.listar_pessoas()
         cpf = self.__tela_pessoa.seleciona_pessoa()
-        pessoa = self.__pega_pessoa_por_cpf(cpf)
+        pessoa = self.pega_pessoa_por_cpf(cpf)
 
-        if pessoa is not None:
+        if pessoa:
             novos_dados = self.__tela_pessoa.pega_dados_pessoa()
-            pessoa.nome = novos_dados["nome"]
-            pessoa.idade = novos_dados["idade"]
-            pessoa.telefone = novos_dados["telefone"]
-            self.__tela_pessoa.mostra_mensagem("Pessoa alterada com sucesso!")
+            if novos_dados:
+                pessoa.nome = novos_dados["nome"]
+                pessoa.idade = novos_dados["idade"]
+                pessoa.cpf = novos_dados["cpf"]
+                pessoa.telefone = novos_dados["telefone"]
+                self.__tela_pessoa.mostra_mensagem(
+                    "Pessoa alterada com sucesso!")
+            else:
+                self.__tela_pessoa.mostra_mensagem(
+                    "Alteração cancelada. Dados inválidos.")
         else:
             self.__tela_pessoa.mostra_mensagem("Pessoa não encontrada.")
 
@@ -51,18 +66,19 @@ class ControladorPessoa:
                 })
 
     def excluir_pessoa(self):
-        self.__listar_pessoas()
+        self.listar_pessoas()
         cpf = self.__tela_pessoa.seleciona_pessoa()
-        pessoa = self.__pega_pessoa_por_cpf(cpf)
+        pessoa = self.pega_pessoa_por_cpf(cpf)
 
-        if pessoa is not None:
+        if pessoa:
             self.__pessoas.remove(pessoa)
             self.__tela_pessoa.mostra_mensagem("Pessoa excluída com sucesso!")
         else:
             self.__tela_pessoa.mostra_mensagem("Pessoa não encontrada.")
 
     def retornar(self):
-        self.__controlador_controladores.abre_tela()
+        print("Retornando ao menu principal...")
+        self.__controlador_controladores.inicializa_sistema()
 
     def abre_tela(self):
         lista_opcoes = {
@@ -73,10 +89,15 @@ class ControladorPessoa:
             0: self.retornar
         }
 
-        while True:
-            opcao = self.__tela_pessoa.mostra_opcoes()
+        sair = False
+        while not sair:
+            opcao = self.__tela_pessoa.tela_opcoes()
             funcao = lista_opcoes.get(opcao)
             if funcao:
-                funcao()
+                if opcao == 0:
+                    sair = True
+                    funcao()
+                else:
+                    funcao()
             else:
-                break
+                print("Opção inválida. Tente novamente.")

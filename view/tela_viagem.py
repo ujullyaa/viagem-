@@ -1,7 +1,6 @@
-
-
 class TelaViagem:
     def tela_opcoes(self):
+        print("\n-------- Viagem ----------")
         print("1 - Incluir Viagem")
         print("2 - Listar Viagens")
         print("3 - Reservar Viagem")
@@ -10,46 +9,56 @@ class TelaViagem:
         print("6 - Excluir Viagem")
         print("0 - Retornar")
 
-        try:
-            return int(input("Escolha uma opção: "))
-        except ValueError:
-            print("Entrada inválida. Digite um número.")
-            return -1
+        while True:
+            try:
+                opcao = int(input("Escolha a opção: "))
+                if opcao in range(0, 7):
+                    return opcao
+                print("Opção inválida. Tente novamente.")
+            except ValueError:
+                print("Entrada inválida. Digite um número.")
 
     def pega_dados_viagem(self):
-        print("----- DADOS DA VIAGEM -----")
-        codigo = input("Código da Viagem: ")
+        print("\n--- NOVA VIAGEM ---")
+        codigo = int(input("Código da viagem: "))
+        data_partida = input("Data de partida (DD/MM/AAAA): ")
+        data_chegada = input("Data de chegada (DD/MM/AAAA): ")
         itinerario = input("Itinerário: ")
-        data_partida = input("Data de Partida (DD/MM/AAAA): ")
-        data_chegada = input("Data de Chegada (DD/MM/AAAA): ")
-        meio_transporte = input("Meio de Transporte: ")
-        empresa_transporte = input("Empresa de Transporte: ")
-        status = input("Status (Agendada / Em andamento / Concluida ): ")
-        preco_base = float(input("Preço Base: "))
+        meio_transporte = input("Meio de transporte: ")
+        empresa_transporte = input("Empresa de transporte: ")
         pagamento = input("Pagamento: ")
-        passageiro = input("Passageiro: ")
+        cpf_pessoa = input("CPF da pessoa responsável pela viagem: ")
 
         return {
             "codigo": codigo,
-            "itinerario": itinerario,
             "data_partida": data_partida,
             "data_chegada": data_chegada,
+            "itinerario": itinerario,
             "meio_transporte": meio_transporte,
             "empresa_transporte": empresa_transporte,
-            "status": status,
-            "preco_base": preco_base,
             "pagamento": pagamento,
-            "passageiro": passageiro
+            "pessoa": cpf_pessoa
         }
 
-    def mostra_viagem(self, dados: dict):
-        print("\n ==== DADOS DA VIAGEM ====")
-        for chave, valor in dados.items():
-            print(f"{chave.capitalize()}: {valor}")
-        print("-" * 30)
+    def mostra_viagem(self, dados_viagem: dict):
+        print("\n--- DADOS DA VIAGEM ---")
+        print(f"Código: {dados_viagem['codigo']}")
+        print(f"Data Partida: {dados_viagem['data_partida']}")
+        print(f"Data Chegada: {dados_viagem['data_chegada']}")
+        print(f"Itinerário: {dados_viagem['itinerario']}")
+        print(f"Meio de Transporte: {dados_viagem['meio_transporte']}")
+        print(f"Empresa de Transporte: {dados_viagem['empresa_transporte']}")
+        print(f"Pagamento: {dados_viagem['pagamento']}")
+        print(f"Pessoa: {dados_viagem['pessoa']}")
+        print("-----------------------------")
 
     def seleciona_viagem(self):
-        return input("Digite o código da viagem: ")
+        while True:
+            try:
+                codigo = int(input("Digite o código da viagem: "))
+                return codigo
+            except ValueError:
+                print("Entrada inválida. Digite um número.")
 
     def mostra_mensagem(self, msg: str):
         print(msg)

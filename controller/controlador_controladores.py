@@ -54,11 +54,10 @@ class ControladorControladores:
             2: self.__controlador_itinerario.abre_tela,
             3: self.__controlador_meio_transporte.abre_tela,
             4: self.__controlador_passagem.abre_tela,
-            5: self.__controlador_viagem.abre_tela,
-            6: self.__controlador_pessoa.abre_tela,
+            5: self.__controlador_pessoa.abre_tela,
+            6: self.__controlador_viagem.abre_tela,
             7: self.__controlador_pagamento.abre_tela,
             0: self.encerrar_sistema
-
         }
 
         while True:
@@ -66,6 +65,9 @@ class ControladorControladores:
             funcao = opcoes.get(opcao)
             if funcao:
                 funcao()
+            else:
+                print("Opção inválida! Tente novamente.")
 
     def encerrar_sistema(self):
+        print("Encerrando o sistema...")
         exit(0)

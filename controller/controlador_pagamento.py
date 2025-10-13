@@ -18,8 +18,11 @@ class ControladorPagamento:
     def incluir_pagamento(self):
         dados_pagamento = self.__tela_pagamento.pega_dados_pagamento()
         forma_pagamento = dados_pagamento["forma_pagamento"]
+
+        # 🔹 Buscar passageiro pelo CPF
         passageiro = self.__controlador_controladores.controlador_pessoa.pega_pessoa_por_cpf(
-            dados_pagamento["passageiro"])
+            dados_pagamento["cpf_passageiro"]
+        )
 
         if not passageiro:
             self.__tela_pagamento.mostra_mensagem("Passageiro não encontrado.")
@@ -40,7 +43,7 @@ class ControladorPagamento:
                 numero_cartao=dados_cartao["numero_cartao"],
                 validade=dados_cartao["validade"],
                 bandeira=dados_cartao["bandeira"],
-                titular=dados_cartao["titular"]
+                titular=dados_cartao["nome_titular"]  # 🔹 corrigido
             )
 
         elif forma_pagamento == "pix":
@@ -63,7 +66,6 @@ class ControladorPagamento:
                 valor_total=valor_total,
                 passageiro=passageiro
             )
-
         else:
             self.__tela_pagamento.mostra_mensagem(
                 "Forma de pagamento inválida.")
@@ -111,13 +113,11 @@ class ControladorPagamento:
             1: self.incluir_pagamento,
             2: self.listar_pagamentos,
             3: self.excluir_pagamento,
-            0: lambda: None
+            0: self.retornar
         }
 
         while True:
             opcao = self.__tela_pagamento.tela_opcoes()
-            if opcao == 0:
-                break
             funcao_escolhida = opcoes.get(opcao)
             if funcao_escolhida:
                 funcao_escolhida()

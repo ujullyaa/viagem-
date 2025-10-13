@@ -4,6 +4,7 @@ from model.pessoa import Pessoa
 from model.pagamento import Pagamento
 from model.meio_transporte import MeioTransporte
 
+
 class ControladorPassagem:
     def __init__(self, controlador_controladores):
         self.__passagens = []
@@ -34,11 +35,13 @@ class ControladorPassagem:
         )
 
         self.__passagens.append(passagem)
-        self.__tela_passagem.mostra_mensagem(" Passagem cadastrada com sucesso!")
+        self.__tela_passagem.mostra_mensagem(
+            " Passagem cadastrada com sucesso!")
 
     def listar_passagens(self):
         if not self.__passagens:
-            self.__tela_passagem.mostra_mensagem(" Nenhuma passagem cadastrada.")
+            self.__tela_passagem.mostra_mensagem(
+                " Nenhuma passagem cadastrada.")
             return
 
         for passagem in self.__passagens:
@@ -70,7 +73,8 @@ class ControladorPassagem:
             passagem.pagamento = novos_dados["pagamento"]
             passagem.meio_transporte = novos_dados["meio_transporte"]
 
-            self.__tela_passagem.mostra_mensagem(" Passagem alterada com sucesso!")
+            self.__tela_passagem.mostra_mensagem(
+                " Passagem alterada com sucesso!")
         else:
             self.__tela_passagem.mostra_mensagem(" Passagem não encontrada.")
 
@@ -81,12 +85,13 @@ class ControladorPassagem:
 
         if passagem:
             self.__passagens.remove(passagem)
-            self.__tela_passagem.mostra_mensagem(" Passagem excluída com sucesso!")
+            self.__tela_passagem.mostra_mensagem(
+                " Passagem excluída com sucesso!")
         else:
             self.__tela_passagem.mostra_mensagem(" Passagem não encontrada.")
 
     def retornar(self):
-        self.__controlador_controladores.abre_tela()
+        self.__controlador_controladores.inicializa_sistema()
 
     def abre_tela(self):
         opcoes = {
@@ -107,4 +112,3 @@ class ControladorPassagem:
                 self.__tela_passagem.mostra_mensagem(" Opção inválida!")
             if opcao == 0:
                 continua = False
-

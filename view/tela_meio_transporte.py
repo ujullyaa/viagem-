@@ -7,7 +7,7 @@ class TelaMeioTransporte:
         print("Escolha a opção:")
         print("1 - Incluir Meio de Transporte")
         print("2 - Alterar Meio de Transporte")
-        print("3 - Listar Meios de Transporte")
+        print("3 - Listar Meio de Transporte")
         print("4 - Excluir Meio de Transporte")
         print("0 - Retornar")
 
@@ -38,7 +38,7 @@ class TelaMeioTransporte:
         print("-----------------------------\n")
 
     def mostra_mensagem(self, msg):
-        print("msg")
+        print(msg)
 
     def seleciona_meio_transporte(self):
         print("----- Selecionar Meio de Transporte -----")

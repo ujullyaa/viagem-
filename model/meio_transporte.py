@@ -5,7 +5,7 @@ class MeioTransporte:
 
         self.__tipo = tipo
         self.__capacidade = capacidade
-        self.__empresa_transporte = []
+        self.__empresa_transporte = empresas_transporte
 
     @property
     def tipo(self):
