@@ -1,6 +1,8 @@
+import os
+
 class TelaControladores:
     def tela_opcoes(self):
-        print("\n==============================")
+        print("==============================")
         print("  SISTEMA DE GERENCIAMENTO DE VIAGENS")
         print("==============================")
         print("1 - Empresa de Transporte")
@@ -11,11 +13,14 @@ class TelaControladores:
         print("6 - Viagem")
         print("7 - Pagamento")
         print("0 - Sair do Sistema")
+        print("==============================")
 
-        try:
-            opcao = int(input("\nEscolha uma opção: "))
-        except ValueError:
-            print("Entrada inválida. Digite um número.")
-            opcao = -1
-
-        return opcao
+        while True:
+            try:
+                opcao = int(input("\nEscolha uma opção: "))
+                if opcao in range(0, 8):
+                    return opcao
+                else:
+                    print("Opção fora do intervalo. Tente novamente.")
+            except ValueError:
+                print("Entrada inválida. Digite um número.")

@@ -1,48 +1,48 @@
-
 class TelaItinerario:
-
     def tela_opcoes(self):
-        print("\n-------- Itinerário ----------")
-        print("Escolha a opção:")
+        print("\n==============================")
+        print("         MENU ITINERÁRIOS      ")
+        print("==============================")
         print("1 - Incluir Itinerário")
         print("2 - Alterar Itinerário")
         print("3 - Listar Itinerários")
         print("4 - Excluir Itinerário")
-        print("0 - Retornar")
+        print("0 - Retornar ao menu anterior")
+        print("==============================")
 
         try:
             opcao = int(input("Escolha a opção: "))
         except ValueError:
-            print("Digite um número válido!")
+            print("\n❌ Entrada inválida! Digite um número.")
             opcao = -1
         return opcao
 
     def pega_dados_itinerario(self):
-        print("\n----- Dados do Itinerário -----")
+        print("\n----- Cadastro de Itinerário -----")
+
         try:
             codigo_itinerario = int(input("Código do Itinerário: "))
         except ValueError:
-            print("Código inválido, deve ser um número!")
+            print("❌ Código inválido! Deve ser um número.")
             return None
 
-        origem = input("Origem: ")
-        destino = input("Destino: ")
-        data_inicio = input("Data de Início (dd/mm/aaaa): ")
-        data_fim = input("Data de Fim (dd/mm/aaaa): ")
+        origem = input("Origem: ").strip()
+        destino = input("Destino: ").strip()
+        data_inicio = input("Data de Início (dd/mm/aaaa): ").strip()
+        data_fim = input("Data de Fim (dd/mm/aaaa): ").strip()
 
         passagens = []
-        adicionar_passagem = input(
-            "Deseja adicionar passagens a este itinerário? (s/n): ").lower()
+        adicionar_passagem = input("Deseja adicionar passagens a este itinerário? (s/n): ").lower()
 
         while adicionar_passagem == "s":
             try:
-                codigo_passagem = int(input("  - Código da passagem: "))
+                codigo_passagem = int(input("  - Código da Passagem: "))
             except ValueError:
-                print("  Código inválido, deve ser um número!")
+                print("❌ Código inválido! Deve ser um número.")
                 continue
 
-            nome_passageiro = input("  - Nome do passageiro: ")
-            data_passagem = input("  - Data da passagem (dd/mm/aaaa): ")
+            nome_passageiro = input("  - Nome do Passageiro: ").strip()
+            data_passagem = input("  - Data da Passagem (dd/mm/aaaa): ").strip()
 
             passagens.append({
                 "codigo_passagem": codigo_passagem,
@@ -50,8 +50,7 @@ class TelaItinerario:
                 "data_passagem": data_passagem
             })
 
-            adicionar_passagem = input(
-                "Deseja adicionar outra passagem? (s/n): ").lower()
+            adicionar_passagem = input("Deseja adicionar outra passagem? (s/n): ").lower()
 
         return {
             "codigo_itinerario": codigo_itinerario,
@@ -63,28 +62,30 @@ class TelaItinerario:
         }
 
     def seleciona_itinerario(self):
+        print("\n----- Selecionar Itinerário -----")
         try:
-            codigo = int(input("Digite o código do itinerário: "))
+            codigo = int(input("Digite o código do Itinerário: "))
             return codigo
         except ValueError:
-            print("Código inválido, deve ser um número!")
+            print("❌ Código inválido! Deve ser um número.")
             return None
 
     def mostra_itinerario(self, dados_itinerario: dict):
-        print("\n--- DADOS DO ITINERÁRIO ---")
+        print("\n🧾 ----- Detalhes do Itinerário -----")
         print(f"Código: {dados_itinerario['codigo_itinerario']}")
         print(f"Origem: {dados_itinerario['origem']}")
         print(f"Destino: {dados_itinerario['destino']}")
         print(f"Data de Início: {dados_itinerario['data_inicio']}")
         print(f"Data de Fim: {dados_itinerario['data_fim']}")
-        if dados_itinerario['passagem']:
-            print("Passagens:")
+
+        if dados_itinerario.get('passagem'):
+            print("\nPassagens:")
             for p in dados_itinerario['passagem']:
-                print(
-                    f"  Código: {p['codigo_passagem']}, Passageiro: {p['nome_passageiro']}, Data: {p['data_passagem']}")
+                print(f"  - Código: {p['codigo_passagem']}, Passageiro: {p['nome_passageiro']}, Data: {p['data_passagem']}")
         else:
-            print("Nenhuma passagem cadastrada.")
-        print("-----------------------------")
+            print("\nNenhuma passagem cadastrada.")
+
+        print("-----------------------------------")
 
     def mostra_mensagem(self, msg: str):
-        print(msg)
+        print(f"\n{msg}\n")

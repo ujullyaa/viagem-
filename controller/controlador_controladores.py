@@ -7,49 +7,31 @@ from controller.controlador_viagem import ControladorViagem
 from controller.controlador_pagamento import ControladorPagamento
 from view.tela_controladores import TelaControladores
 
-
 class ControladorControladores:
     def __init__(self):
-        self.__tela_controladores = TelaControladores()
-        self.__controlador_empresa_transporte = ControladorEmpresaTransporte(
-            self)
+        self.__tela = TelaControladores()
+
+        # Criação dos controladores — **uma única instância para cada**
+        self.__controlador_empresa_transporte = ControladorEmpresaTransporte(self)
+        self.__controlador_meio_transporte = ControladorMeioTransporte(
+            self, self.__controlador_empresa_transporte
+        )
         self.__controlador_itinerario = ControladorItinerario(self)
-        self.__controlador_meio_transporte = ControladorMeioTransporte(self)
-        self.__controlador_passagem = ControladorPassagem(self)
-        self.__controlador_viagem = ControladorViagem(self)
         self.__controlador_pessoa = ControladorPessoa(self)
+
+        # Controlador de passagens recebe as dependências corretas
+        self.__controlador_passagem = ControladorPassagem(
+            controlador_controladores=self,
+            controlador_itinerario=self.__controlador_itinerario,
+            controlador_pessoa=self.__controlador_pessoa,
+            controlador_meio_transporte=self.__controlador_meio_transporte
+        )
+
+        self.__controlador_viagem = ControladorViagem(self)
         self.__controlador_pagamento = ControladorPagamento(self)
 
-    @property
-    def controlador_empresa_transporte(self):
-        return self.__controlador_empresa_transporte
-
-    @property
-    def controlador_itinerario(self):
-        return self.__controlador_itinerario
-
-    @property
-    def controlador_meio_transporte(self):
-        return self.__controlador_meio_transporte
-
-    @property
-    def controlador_passagem(self):
-        return self.__controlador_passagem
-
-    @property
-    def controlador_viagem(self):
-        return self.__controlador_viagem
-
-    @property
-    def controlador_pessoa(self):
-        return self.__controlador_pessoa
-
-    @property
-    def controlador_pagamento(self):
-        return self.__controlador_pagamento
-
-    def inicializa_sistema(self):
-        opcoes = {
+        # Dicionário com as opções do menu principal
+        self.__opcoes = {
             1: self.__controlador_empresa_transporte.abre_tela,
             2: self.__controlador_itinerario.abre_tela,
             3: self.__controlador_meio_transporte.abre_tela,
@@ -60,14 +42,16 @@ class ControladorControladores:
             0: self.encerrar_sistema
         }
 
+    def inicializa_sistema(self):
+        """Exibe o menu principal e executa a opção escolhida."""
         while True:
-            opcao = self.__tela_controladores.tela_opcoes()
-            funcao = opcoes.get(opcao)
+            opcao = self.__tela.tela_opcoes()
+            funcao = self.__opcoes.get(opcao)
             if funcao:
                 funcao()
             else:
-                print("Opção inválida! Tente novamente.")
+                print("\n❌ Opção inválida! Tente novamente.")
 
     def encerrar_sistema(self):
-        print("Encerrando o sistema...")
+        print("\n✅ Sistema encerrado com sucesso.")
         exit(0)

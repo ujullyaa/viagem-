@@ -1,13 +1,12 @@
 from view.tela_meio_transporte import TelaMeioTransporte
 from model.meio_transporte import MeioTransporte
 
-
 class ControladorMeioTransporte:
-
-    def __init__(self, controlador_controladores):
+    def __init__(self, controlador_controladores, controlador_empresa_transporte):
         self.__meios_transporte = []
         self.__tela_meio_transporte = TelaMeioTransporte()
         self.__controlador_controladores = controlador_controladores
+        self.__controlador_empresa_transporte = controlador_empresa_transporte
 
     def pega_meio_por_tipo(self, tipo):
         tipo = tipo.strip().lower()
@@ -17,81 +16,79 @@ class ControladorMeioTransporte:
         return None
 
     def incluir_meio_transporte(self):
+        empresas = self.__controlador_empresa_transporte.empresas
+        if not empresas:
+            self.__tela_meio_transporte.mostra_mensagem(
+                "Nenhuma empresa de transporte cadastrada! Cadastre uma primeiro."
+            )
+            return
+
         dados_meio_transporte = self.__tela_meio_transporte.pega_dados_meio_transporte()
-        if dados_meio_transporte:
-            meio = MeioTransporte(
-                dados_meio_transporte["tipo"],
-                dados_meio_transporte["capacidade"],
-                dados_meio_transporte["empresa"]
-            )
-            self.__meios_transporte.append(meio)
-            self.__tela_meio_transporte.mostra_mensagem(
-                "Meio de transporte cadastrado com sucesso!"
-            )
-        else:
-            self.__tela_meio_transporte.mostra_mensagem(
-                "Falha ao cadastrar. Dados inválidos."
-            )
+        if not dados_meio_transporte:
+            self.__tela_meio_transporte.mostra_mensagem("Dados inválidos.")
+            return
+
+        # Escolher empresa existente
+        self.__tela_meio_transporte.mostra_mensagem("Escolha a empresa responsável:")
+        for i, empresa in enumerate(empresas, start=1):
+            print(f"{i}. {empresa.nome_empresa} - CNPJ: {empresa.cnpj}")
+
+        indice = input("Digite o número da empresa: ").strip()
+        if not indice.isdigit() or int(indice) < 1 or int(indice) > len(empresas):
+            self.__tela_meio_transporte.mostra_mensagem("Opção inválida.")
+            return
+
+        empresa_escolhida = empresas[int(indice) - 1]
+
+        meio = MeioTransporte(
+            dados_meio_transporte["tipo"],
+            dados_meio_transporte["capacidade"],
+            empresa_escolhida
+        )
+
+        self.__meios_transporte.append(meio)
+        self.__tela_meio_transporte.mostra_mensagem(
+            f"Meio de transporte '{meio.tipo}' cadastrado com sucesso!"
+        )
 
     def lista_meio_transporte(self):
         if not self.__meios_transporte:
-            self.__tela_meio_transporte.mostra_mensagem(
-                "Nenhum meio de transporte cadastrado.")
+            self.__tela_meio_transporte.mostra_mensagem("Nenhum meio de transporte cadastrado.")
             return
 
-        for meio_transporte in self.__meios_transporte:
+        for meio in self.__meios_transporte:
             self.__tela_meio_transporte.mostra_meio({
-                "tipo": meio_transporte.tipo,
-                "capacidade": meio_transporte.capacidade,
-                "empresa": meio_transporte.empresa
+                "tipo": meio.tipo,
+                "capacidade": meio.capacidade,
+                "empresa": meio.empresa_transporte.nome_empresa
             })
 
     def excluir_meio_transporte(self):
         self.lista_meio_transporte()
         tipo_meio = self.__tela_meio_transporte.seleciona_meio_transporte()
-        if not tipo_meio:
-            self.__tela_meio_transporte.mostra_mensagem(
-                "Nenhum tipo informado.")
-            return
-
-        tipo_meio = tipo_meio.strip().lower()
         meio = self.pega_meio_por_tipo(tipo_meio)
-
         if meio:
             self.__meios_transporte.remove(meio)
             self.__tela_meio_transporte.mostra_mensagem(
                 f"Meio de transporte '{meio.tipo}' excluído com sucesso!"
             )
         else:
-            self.__tela_meio_transporte.mostra_mensagem(
-                "ATENÇÃO: Meio de transporte não existente."
-            )
+            self.__tela_meio_transporte.mostra_mensagem("Meio não encontrado.")
 
     def alterar_meio_transporte(self):
         tipo = self.__tela_meio_transporte.seleciona_meio_transporte()
-        if not tipo:
-            self.__tela_meio_transporte.mostra_mensagem(
-                "Nenhum tipo informado.")
+        meio = self.pega_meio_por_tipo(tipo)
+        if not meio:
+            self.__tela_meio_transporte.mostra_mensagem("Meio não encontrado.")
             return
 
-        meio = self.pega_meio_por_tipo(tipo)
-        if meio:
-            novos_dados = self.__tela_meio_transporte.pega_dados_meio_transporte()
-            if novos_dados:
-                meio.tipo = novos_dados["tipo"]
-                meio.capacidade = novos_dados["capacidade"]
-                meio.empresa = novos_dados["empresa"]
-                self.__tela_meio_transporte.mostra_mensagem(
-                    "Meio de transporte atualizado com sucesso!"
-                )
-            else:
-                self.__tela_meio_transporte.mostra_mensagem(
-                    "Alteração cancelada. Dados inválidos."
-                )
+        novos_dados = self.__tela_meio_transporte.pega_dados_meio_transporte()
+        if novos_dados:
+            meio.tipo = novos_dados["tipo"]
+            meio.capacidade = novos_dados["capacidade"]
+            self.__tela_meio_transporte.mostra_mensagem("Meio atualizado com sucesso!")
         else:
-            self.__tela_meio_transporte.mostra_mensagem(
-                "ATENÇÃO: Meio de transporte não existente."
-            )
+            self.__tela_meio_transporte.mostra_mensagem("Alteração cancelada.")
 
     def retornar(self):
         self.__controlador_controladores.inicializa_sistema()
@@ -114,4 +111,4 @@ class ControladorMeioTransporte:
                     sair = True
                 funcao_escolhida()
             else:
-                print("Opção inválida, tente novamente.")
+                self.__tela_meio_transporte.mostra_mensagem("Opção inválida.")

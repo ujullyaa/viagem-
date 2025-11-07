@@ -1,12 +1,15 @@
 from view.tela_empresa_transporte import TelaEmpresaTransporte
 from model.empresa_transporte import EmpresaTransporte
 
-
 class ControladorEmpresaTransporte:
     def __init__(self, controlador_controladores):
         self.__empresas = []
         self.__tela_empresa = TelaEmpresaTransporte()
         self.__controlador_controladores = controlador_controladores
+
+    @property
+    def empresas(self):
+        return self.__empresas
 
     def pega_empresa_por_cnpj(self, cnpj: str):
         for empresa in self.__empresas:
@@ -43,8 +46,7 @@ class ControladorEmpresaTransporte:
         empresa = self.pega_empresa_por_cnpj(cnpj)
         if empresa:
             self.__empresas.remove(empresa)
-            self.__tela_empresa.mostra_mensagem(
-                "Empresa removida com sucesso!")
+            self.__tela_empresa.mostra_mensagem("Empresa removida com sucesso!")
         else:
             self.__tela_empresa.mostra_mensagem("Empresa não encontrada.")
 
@@ -64,6 +66,7 @@ class ControladorEmpresaTransporte:
             funcao = opcoes.get(escolha)
             if funcao:
                 funcao()
+                if escolha == 0:
+                    break
             else:
                 self.__tela_empresa.mostra_mensagem("Opção inválida.")
-

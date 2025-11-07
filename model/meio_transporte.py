@@ -1,11 +1,10 @@
 from model.empresa_transporte import EmpresaTransporte
 
 class MeioTransporte:
-    def __init__(self, tipo: str, capacidade: int, empresas_transporte: str):
-
+    def __init__(self, tipo: str, capacidade: int, empresa_transporte: EmpresaTransporte):
         self.__tipo = tipo
         self.__capacidade = capacidade
-        self.__empresa_transporte = empresas_transporte
+        self.__empresa_transporte = empresa_transporte
 
     @property
     def tipo(self):
@@ -24,11 +23,15 @@ class MeioTransporte:
         self.__capacidade = capacidade
 
     @property
-    def empresa(self):
+    def empresa_transporte(self):
         return self.__empresa_transporte
 
-    @empresa.setter
-    def empresa(self, empresa_transporte):
+    @empresa_transporte.setter
+    def empresa_transporte(self, empresa_transporte: EmpresaTransporte):
         self.__empresa_transporte = empresa_transporte
 
-
+    def __str__(self):
+        nome_empresa = (
+            self.__empresa_transporte.nome_empresa if self.__empresa_transporte else "Sem empresa"
+        )
+        return f"{self.__tipo} ({self.__capacidade} lugares) - {nome_empresa}"

@@ -1,41 +1,43 @@
-
 class TelaPassagem:
     def tela_opcoes(self):
-        print("-------- Passagem ----------")
+        print("\n==============================")
+        print("         MENU PASSAGENS        ")
+        print("==============================")
         print("1 - Incluir Passagem")
         print("2 - Alterar Passagem")
         print("3 - Listar Passagens")
         print("4 - Excluir Passagem")
-        print("0 - Retornar")
+        print("0 - Retornar ao menu anterior")
+        print("==============================")
 
         try:
             opcao = int(input("Escolha a opção: "))
         except ValueError:
-            print(" Digite um número válido!")
+            print("\n❌ Entrada inválida! Digite um número.")
             opcao = -1
         return opcao
 
     def pega_dados_passagem(self):
-        print("\n----- Dados da Passagem -----")
+        print("\n----- Cadastro de Passagem -----")
+
         try:
             numero = int(input("Número da Passagem: "))
         except ValueError:
-            print(" Número inválido.")
+            print("❌ Número inválido.")
             return None
 
-        assento = input("Assento: ")
-        data_viagem = input("Data da Viagem (dd/mm/aaaa): ")
+        assento = input("Assento: ").strip()
+        data_viagem = input("Data da Viagem (dd/mm/aaaa): ").strip()
 
         try:
-            valor = float(input("Valor da Passagem: R$ "))
+            valor = float(input("Valor da Passagem (R$): "))
         except ValueError:
-            print(" Valor inválido.")
+            print("❌ Valor inválido.")
             return None
 
-        pessoa = input("Nome do Passageiro: ")
-        pagamento = input("Forma de Pagamento (cartão/dinheiro/pix): ")
-        meio_transporte = input(
-            "Tipo de Meio de Transporte (ônibus/avião/navio): ")
+        pessoa = input("Nome do Passageiro: ").strip()
+        pagamento = input("Forma de Pagamento (Cartão / Dinheiro / Pix): ").strip()
+        meio_transporte = input("Tipo de Transporte (Ônibus / Avião / Navio): ").strip()
 
         return {
             "numero": numero,
@@ -48,15 +50,15 @@ class TelaPassagem:
         }
 
     def mostra_passagem(self, dados_passagem):
-        print("\n----- Passagem -----")
+        print("\n🧾 ----- Detalhes da Passagem -----")
         print(f"Número: {dados_passagem['numero']}")
         print(f"Assento: {dados_passagem['assento']}")
-        print(f"Data: {dados_passagem['data_viagem']}")
+        print(f"Data da Viagem: {dados_passagem['data_viagem']}")
         print(f"Valor: R$ {dados_passagem['valor']:.2f}")
         print(f"Passageiro: {dados_passagem['pessoa']}")
         print(f"Pagamento: {dados_passagem['pagamento']}")
-        print(f"Transporte: {dados_passagem['meio_transporte']}")
-        print("-----------------------\n")
+        print(f"Meio de Transporte: {dados_passagem['meio_transporte']}")
+        print("-----------------------------------")
 
     def mostra_mensagem(self, msg):
         print(f"\n{msg}\n")
@@ -65,7 +67,7 @@ class TelaPassagem:
         print("\n----- Selecionar Passagem -----")
         try:
             numero = int(input("Digite o número da passagem: "))
+            return numero
         except ValueError:
-            print(" Número inválido!")
+            print("❌ Número inválido.")
             return None
-        return numero
