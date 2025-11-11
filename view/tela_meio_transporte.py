@@ -1,14 +1,14 @@
-
+import FreeSimpleGUI as sg
 class TelaMeioTransporte:
 
     def tela_opcoes(self):
-        print("-------- Meio de Transporte ----------")
-        print("Escolha a opção:")
-        print("1 - Incluir Meio de Transporte")
-        print("2 - Alterar Meio de Transporte")
-        print("3 - Listar Meio de Transporte")
-        print("4 - Excluir Meio de Transporte")
-        print("0 - Retornar")
+        [sg.Text("-------- Meio de Transporte ----------"), font=
+        [sg.Text("Escolha a opção:") font=
+        [sg.Radio("1 - Incluir Meio de Transporte"),key
+        [sg.Radio("2 - Alterar Meio de Transporte")
+        [sg.Radio("3 - Listar Meio de Transporte")
+        [sg.Radio("4 - Excluir Meio de Transporte")
+        [sg.Radio("0 - Retornar")
 
         try:
             opcao = int(input("Escolha a opção: "))
