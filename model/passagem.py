@@ -2,20 +2,18 @@ from model.pessoa import Pessoa
 from model.pagamento import Pagamento
 from model.meio_transporte import MeioTransporte
 
-
 class Passagem:
     def __init__(
         self,
-        numero: int,
+        numero: str,
         assento: str,
         data_viagem: str,
         valor: float,
         pessoa: Pessoa,
-        pagamento: Pagamento,
+        pagamento: Pagamento | None,
         meio_transporte: MeioTransporte
     ):
-    
-        self.__numero = numero
+        self.__numero = str(numero).zfill(6)
         self.__assento = assento
         self.__data_viagem = data_viagem
         self.__valor = valor
@@ -23,14 +21,13 @@ class Passagem:
         self.__pagamento = pagamento
         self.__meio_transporte = meio_transporte
 
-
     @property
     def numero(self):
         return self.__numero
 
     @numero.setter
     def numero(self, numero):
-        self.__numero = numero
+        self.__numero = str(numero).zfill(6)
 
     @property
     def assento(self):
@@ -56,7 +53,6 @@ class Passagem:
     def valor(self, valor):
         self.__valor = valor
 
-    # --- Relacionamentos ---
     @property
     def pessoa(self):
         return self.__pessoa

@@ -1,7 +1,6 @@
 from daos.dao import DAO
 from model.viagem import Viagem
 
-# Implementação DAO para Viagem
 class ViagemDAO(DAO):
     def __init__(self):
         super().__init__('viagem.pkl')

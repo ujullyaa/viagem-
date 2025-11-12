@@ -1,7 +1,6 @@
+# controller/controlador_passagem.py
 from view.tela_passagem import TelaPassagem
 from model.passagem import Passagem
-from model.pessoa import Pessoa
-from model.meio_transporte import MeioTransporte
 from daos.passagem_dao import PassagemDAO
 
 class ControladorPassagem:
@@ -13,10 +12,11 @@ class ControladorPassagem:
         self.__controlador_pessoa = controlador_pessoa
         self.__controlador_meio_transporte = controlador_meio_transporte
 
-    def pega_passagem_por_numero(self, numero: int) -> Passagem | None:
-        for passagem in self.__passagem_dao.get_all:
-            if passagem.numero == numero:
-                return passagem
+    def pega_passagem_por_numero(self, numero):
+        numero = str(numero).zfill(6)
+        for p in self.__passagem_dao.get_all():
+            if p.numero == numero:
+                return p
         return None
 
     def incluir_passagem(self):
@@ -25,7 +25,8 @@ class ControladorPassagem:
             self.__tela_passagem.mostra_mensagem("❌ Dados inválidos.")
             return
 
-        if self.pega_passagem_por_numero(dados["numero"]):
+        numero = str(dados["numero"]).zfill(6)
+        if self.pega_passagem_por_numero(numero):
             self.__tela_passagem.mostra_mensagem("⚠️ Já existe uma passagem com esse número.")
             return
 
@@ -45,105 +46,46 @@ class ControladorPassagem:
 
         self.__controlador_itinerario.listar_itinerarios()
         codigo_itinerario = self.__tela_passagem.seleciona_itinerario()
-        itinerario = self.__controlador_itinerario.pega_itinerario_por_codigo_itinerario(codigo_itinerario)
+        itinerario = self.__controlador_itinerario.pega_itinerario_por_codigo(codigo_itinerario)
         if not itinerario:
             self.__tela_passagem.mostra_mensagem("❌ Itinerário não encontrado.")
             return
 
-        nova_passagem = Passagem(
-            numero=dados["numero"],
+        passagem = Passagem(
+            numero=numero,
             assento=dados["assento"],
             data_viagem=dados["data_viagem"],
             valor=dados["valor"],
             pessoa=pessoa,
-            pagamento=None,  # pode conectar pagamento depois
+            pagamento=None,
             meio_transporte=meio_transporte
         )
+        self.__passagem_dao.add(passagem)
+        itinerario.passagem.append(passagem)
 
-        self.__passagem_dao.add(nova_passagem)
-        itinerario.passagem.append(nova_passagem)
-
-        self.__tela_passagem.mostra_mensagem("✅ Passagem cadastrada com sucesso!")
+        self.__tela_passagem.mostra_mensagem(f"✅ Passagem nº {numero} cadastrada com sucesso!")
 
     def listar_passagens(self):
-        if not self.__passagem_dao.get_all:
+        passagens = self.__passagem_dao.get_all()
+        if not passagens:
             self.__tela_passagem.mostra_mensagem("📭 Nenhuma passagem cadastrada.")
             return
 
-        for passagem in self.__passagem_dao.get_all:
+        for p in passagens:
             self.__tela_passagem.mostra_passagem({
-                "numero": passagem.numero,
-                "assento": passagem.assento,
-                "data_viagem": passagem.data_viagem,
-                "valor": passagem.valor,
-                "pessoa": passagem.pessoa.nome if isinstance(passagem.pessoa, Pessoa) else "N/A",
-                "meio_transporte": passagem.meio_transporte.tipo if isinstance(passagem.meio_transporte, MeioTransporte) else "N/A"
+                "numero": p.numero,
+                "assento": p.assento,
+                "data_viagem": p.data_viagem,
+                "valor": p.valor,
+                "pessoa": p.pessoa.nome,
+                "meio_transporte": p.meio_transporte.tipo
             })
-
-    def alterar_passagem(self):
-        if not self.__passagem_dao.get_all:
-            self.__tela_passagem.mostra_mensagem("📭 Nenhuma passagem para alterar.")
-            return
-
-        numero = self.__tela_passagem.seleciona_passagem()
-        passagem = self.pega_passagem_por_numero(numero)
-        if not passagem:
-            self.__tela_passagem.mostra_mensagem("❌ Passagem não encontrada.")
-            return
-
-        dados = self.__tela_passagem.pega_dados_passagem()
-        if not dados:
-            self.__tela_passagem.mostra_mensagem("❌ Dados inválidos.")
-            return
-
-        passagem.numero = dados["numero"]
-        passagem.assento = dados["assento"]
-        passagem.data_viagem = dados["data_viagem"]
-        passagem.valor = dados["valor"]
-
-        self.__controlador_pessoa.listar_pessoas()
-        cpf = self.__tela_passagem.seleciona_pessoa()
-        pessoa = self.__controlador_pessoa.pega_pessoa_por_cpf(cpf)
-        if pessoa:
-            passagem.pessoa = pessoa
-
-        self.__controlador_meio_transporte.lista_meio_transporte()
-        tipo_meio = self.__tela_passagem.seleciona_meio_transporte()
-        meio_transporte = self.__controlador_meio_transporte.pega_meio_por_tipo(tipo_meio)
-        if meio_transporte:
-            passagem.meio_transporte = meio_transporte
-
-        self.__tela_passagem.mostra_mensagem("✅ Passagem alterada com sucesso!")
-
-    def excluir_passagem(self):
-        if not self.__passagem_dao.get_all:
-            self.__tela_passagem.mostra_mensagem("📭 Nenhuma passagem para excluir.")
-            return
-
-        self.listar_passagens()
-        numero = self.__tela_passagem.seleciona_passagem()
-        passagem = self.pega_passagem_por_numero(numero)
-        if not passagem:
-            self.__tela_passagem.mostra_mensagem("❌ Passagem não encontrada.")
-            return
-
-        for itinerario in self.__controlador_itinerario.itinerarios:
-            if passagem in itinerario.passagem:
-                itinerario.passagem.remove(passagem)
-
-        self.__passagem_dao.remove(passagem)
-        self.__tela_passagem.mostra_mensagem("🗑️ Passagem excluída com sucesso!")
-
-    def retornar(self):
-        self.__controlador_controladores.inicializa_sistema()
 
     def abre_tela(self):
         opcoes = {
             1: self.incluir_passagem,
-            2: self.alterar_passagem,
             3: self.listar_passagens,
-            4: self.excluir_passagem,
-            0: self.retornar
+            0: self.__controlador_controladores.inicializa_sistema
         }
 
         while True:
@@ -153,6 +95,5 @@ class ControladorPassagem:
                 funcao()
             else:
                 self.__tela_passagem.mostra_mensagem("❌ Opção inválida!")
-
             if escolha == 0:
                 break

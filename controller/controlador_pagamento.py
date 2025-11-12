@@ -1,7 +1,8 @@
 from view.tela_pagamento import TelaPagamento
-from model.pagamento import Cartao, pix, Cedula
+from model.pagamento import Cartao, Pix, Cedula
 from random import randint
 from daos.pagamento_dao import PagamentoDAO
+
 
 class ControladorPagamento:
     def __init__(self, controlador_controladores):
@@ -10,7 +11,7 @@ class ControladorPagamento:
         self.__controlador_controladores = controlador_controladores
 
     def pega_pagamento_por_codigo(self, codigo: int):
-        for pagamento in self.__pagamento_dao.get_all:
+        for pagamento in self.__pagamento_dao.get_all():
             if pagamento.codigo == codigo:
                 return pagamento
         return None
@@ -19,7 +20,6 @@ class ControladorPagamento:
         dados_pagamento = self.__tela_pagamento.pega_dados_pagamento()
         forma_pagamento = dados_pagamento["forma_pagamento"]
 
-        # 🔹 Buscar passageiro pelo CPF
         passageiro = self.__controlador_controladores.controlador_pessoa.pega_pessoa_por_cpf(
             dados_pagamento["cpf_passageiro"]
         )
@@ -43,12 +43,12 @@ class ControladorPagamento:
                 numero_cartao=dados_cartao["numero_cartao"],
                 validade=dados_cartao["validade"],
                 bandeira=dados_cartao["bandeira"],
-                titular=dados_cartao["nome_titular"]  # 🔹 corrigido
+                titular=dados_cartao["nome_titular"]
             )
 
         elif forma_pagamento == "pix":
             dados_pix = self.__tela_pagamento.pega_dados_pix()
-            pagamento = pix(
+            pagamento = Pix(
                 forma_pagamento="pix",
                 pagou=pagou,
                 data=data,
@@ -66,24 +66,23 @@ class ControladorPagamento:
                 valor_total=valor_total,
                 passageiro=passageiro
             )
+
         else:
-            self.__tela_pagamento.mostra_mensagem(
-                "Forma de pagamento inválida.")
+            self.__tela_pagamento.mostra_mensagem("Forma de pagamento inválida.")
             return
 
         pagamento.codigo = randint(1, 10000)
         pagamento.processar_pagamento()
         self.__pagamento_dao.add(pagamento)
-        self.__tela_pagamento.mostra_mensagem(
-            "Pagamento cadastrado com sucesso!")
+        self.__tela_pagamento.mostra_mensagem("Pagamento cadastrado com sucesso!")
 
     def listar_pagamentos(self):
-        if not self.__pagamento_dao.get_all:
-            self.__tela_pagamento.mostra_mensagem(
-                "Nenhum pagamento cadastrado.")
+        pagamentos = self.__pagamento_dao.get_all()
+        if not pagamentos:
+            self.__tela_pagamento.mostra_mensagem("Nenhum pagamento cadastrado.")
             return
 
-        for pagamento in self.__pagamento_dao.get_all:
+        for pagamento in pagamentos:
             self.__tela_pagamento.mostra_pagamento({
                 "codigo": pagamento.codigo,
                 "forma_pagamento": pagamento.forma_pagamento,
@@ -99,9 +98,8 @@ class ControladorPagamento:
         pagamento = self.pega_pagamento_por_codigo(codigo)
 
         if pagamento:
-            self.__pagamento_dao.remove(pagamento)
-            self.__tela_pagamento.mostra_mensagem(
-                "Pagamento excluído com sucesso!")
+            self.__pagamento_dao.remove(pagamento.codigo)
+            self.__tela_pagamento.mostra_mensagem("Pagamento excluído com sucesso!")
         else:
             self.__tela_pagamento.mostra_mensagem("Pagamento não encontrado.")
 
