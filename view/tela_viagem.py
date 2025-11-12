@@ -1,64 +1,109 @@
-class TelaViagem:
-    def tela_opcoes(self):
-        print("\n-------- Viagem ----------")
-        print("1 - Incluir Viagem")
-        print("2 - Listar Viagens")
-        print("3 - Reservar Viagem")
-        print("4 - Cancelar Viagem")
-        print("5 - Atualizar Viagem")
-        print("6 - Excluir Viagem")
-        print("0 - Retornar")
+import FreeSimpleGUI as sg
 
-        while True:
-            try:
-                opcao = int(input("Escolha a opção: "))
-                if opcao in range(0, 7):
-                    return opcao
-                print("Opção inválida. Tente novamente.")
-            except ValueError:
-                print("Entrada inválida. Digite um número.")
+class TelaViagem:
+    def __init__(self):
+        sg.theme("DarkBlue14")
+
+    def tela_opcoes(self):
+        layout = [
+            [sg.Text("===== MENU VIAGENS =====", font=("Arial", 14, "bold"))],
+            [sg.Button("1 - Incluir Viagem")],
+            [sg.Button("2 - Listar Viagens")],
+            [sg.Button("3 - Reservar Viagem")],
+            [sg.Button("4 - Cancelar Viagem")],
+            [sg.Button("5 - Atualizar Viagem")],
+            [sg.Button("6 - Excluir Viagem")],
+            [sg.Button("0 - Retornar")]
+        ]
+
+        janela = sg.Window("Menu Viagens", layout)
+        evento, _ = janela.read()
+        janela.close()
+
+        if evento in (sg.WIN_CLOSED, "0 - Retornar"):
+            return 0
+        elif evento == "1 - Incluir Viagem":
+            return 1
+        elif evento == "2 - Listar Viagens":
+            return 2
+        elif evento == "3 - Reservar Viagem":
+            return 3
+        elif evento == "4 - Cancelar Viagem":
+            return 4
+        elif evento == "5 - Atualizar Viagem":
+            return 5
+        elif evento == "6 - Excluir Viagem":
+            return 6
+        return -1
 
     def pega_dados_viagem(self):
-        print("\n--- NOVA VIAGEM ---")
-        codigo = int(input("Código da viagem: "))
-        data_partida = input("Data de partida (DD/MM/AAAA): ")
-        data_chegada = input("Data de chegada (DD/MM/AAAA): ")
-        itinerario = input("Itinerário: ")
-        meio_transporte = input("Meio de transporte: ")
-        empresa_transporte = input("Empresa de transporte: ")
-        pagamento = input("Pagamento: ")
-        cpf_pessoa = input("CPF da pessoa responsável pela viagem: ")
+        layout = [
+            [sg.Text("Cadastro de Viagem", font=("Arial", 14, "bold"))],
+            [sg.Text("Código da Viagem:", size=(20, 1)), sg.Input(key="codigo")],
+            [sg.Text("Data de Partida (DD/MM/AAAA):", size=(20, 1)), sg.Input(key="data_partida")],
+            [sg.Text("Data de Chegada (DD/MM/AAAA):", size=(20, 1)), sg.Input(key="data_chegada")],
+            [sg.Text("Itinerário:", size=(20, 1)), sg.Input(key="itinerario")],
+            [sg.Text("Meio de Transporte:", size=(20, 1)), sg.Input(key="meio_transporte")],
+            [sg.Text("Empresa de Transporte:", size=(20, 1)), sg.Input(key="empresa_transporte")],
+            [sg.Text("Pagamento:", size=(20, 1)), sg.Input(key="pagamento")],
+            [sg.Text("CPF do Responsável:", size=(20, 1)), sg.Input(key="pessoa")],
+            [sg.Button("Confirmar"), sg.Button("Cancelar")]
+        ]
 
-        return {
-            "codigo": codigo,
-            "data_partida": data_partida,
-            "data_chegada": data_chegada,
-            "itinerario": itinerario,
-            "meio_transporte": meio_transporte,
-            "empresa_transporte": empresa_transporte,
-            "pagamento": pagamento,
-            "pessoa": cpf_pessoa
-        }
+        janela = sg.Window("Nova Viagem", layout)
+        evento, valores = janela.read()
+        janela.close()
+
+        if evento == "Confirmar":
+            try:
+                codigo = int(valores["codigo"])
+            except ValueError:
+                sg.popup_error("❌ Código inválido! Deve ser um número.")
+                return None
+
+            return {
+                "codigo": codigo,
+                "data_partida": valores["data_partida"],
+                "data_chegada": valores["data_chegada"],
+                "itinerario": valores["itinerario"],
+                "meio_transporte": valores["meio_transporte"],
+                "empresa_transporte": valores["empresa_transporte"],
+                "pagamento": valores["pagamento"],
+                "pessoa": valores["pessoa"]
+            }
+        return None
 
     def mostra_viagem(self, dados_viagem: dict):
-        print("\n--- DADOS DA VIAGEM ---")
-        print(f"Código: {dados_viagem['codigo']}")
-        print(f"Data Partida: {dados_viagem['data_partida']}")
-        print(f"Data Chegada: {dados_viagem['data_chegada']}")
-        print(f"Itinerário: {dados_viagem['itinerario']}")
-        print(f"Meio de Transporte: {dados_viagem['meio_transporte']}")
-        print(f"Empresa de Transporte: {dados_viagem['empresa_transporte']}")
-        print(f"Pagamento: {dados_viagem['pagamento']}")
-        print(f"Pessoa: {dados_viagem['pessoa']}")
-        print("-----------------------------")
+        texto = (
+            f"Código: {dados_viagem['codigo']}\n"
+            f"Data Partida: {dados_viagem['data_partida']}\n"
+            f"Data Chegada: {dados_viagem['data_chegada']}\n"
+            f"Itinerário: {dados_viagem['itinerario']}\n"
+            f"Meio de Transporte: {dados_viagem['meio_transporte']}\n"
+            f"Empresa de Transporte: {dados_viagem['empresa_transporte']}\n"
+            f"Pagamento: {dados_viagem['pagamento']}\n"
+            f"Pessoa: {dados_viagem['pessoa']}"
+        )
+        sg.popup_scrolled(texto, title="📋 Dados da Viagem", font=("Arial", 11))
 
     def seleciona_viagem(self):
-        while True:
+        layout = [
+            [sg.Text("Digite o código da viagem:")],
+            [sg.Input(key="codigo")],
+            [sg.Button("Confirmar"), sg.Button("Cancelar")]
+        ]
+
+        janela = sg.Window("Selecionar Viagem", layout)
+        evento, valores = janela.read()
+        janela.close()
+
+        if evento == "Confirmar":
             try:
-                codigo = int(input("Digite o código da viagem: "))
-                return codigo
+                return int(valores["codigo"])
             except ValueError:
-                print("Entrada inválida. Digite um número.")
+                sg.popup_error("❌ Código inválido! Deve ser um número.")
+                return None
+        return None
 
     def mostra_mensagem(self, msg: str):
-        print(msg)
+        sg.popup(msg, title="Mensagem", font=("Arial", 11))
