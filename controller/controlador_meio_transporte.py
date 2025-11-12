@@ -1,16 +1,17 @@
 from view.tela_meio_transporte import TelaMeioTransporte
 from model.meio_transporte import MeioTransporte
+from dao.itinerario_dao import ItinerarioDAO
 
 class ControladorMeioTransporte:
     def __init__(self, controlador_controladores, controlador_empresa_transporte):
-        self.__meios_transporte = []
+        self.__meio_transporte_dao = ItinerarioDAO()
         self.__tela_meio_transporte = TelaMeioTransporte()
         self.__controlador_controladores = controlador_controladores
         self.__controlador_empresa_transporte = controlador_empresa_transporte
 
     def pega_meio_por_tipo(self, tipo):
         tipo = tipo.strip().lower()
-        for meio in self.__meios_transporte:
+        for meio in self.__meio_transporte_dao.get_all:
             if meio.tipo.strip().lower() == tipo:
                 return meio
         return None
@@ -46,17 +47,17 @@ class ControladorMeioTransporte:
             empresa_escolhida
         )
 
-        self.__meios_transporte.append(meio)
+        self.__meio_transporte_dao.add(meio)
         self.__tela_meio_transporte.mostra_mensagem(
             f"Meio de transporte '{meio.tipo}' cadastrado com sucesso!"
         )
 
     def lista_meio_transporte(self):
-        if not self.__meios_transporte:
+        if not self.__meio_transporte_dao.get_all:
             self.__tela_meio_transporte.mostra_mensagem("Nenhum meio de transporte cadastrado.")
             return
 
-        for meio in self.__meios_transporte:
+        for meio in self.__meio_transporte_dao.get_all:
             self.__tela_meio_transporte.mostra_meio({
                 "tipo": meio.tipo,
                 "capacidade": meio.capacidade,
@@ -68,7 +69,7 @@ class ControladorMeioTransporte:
         tipo_meio = self.__tela_meio_transporte.seleciona_meio_transporte()
         meio = self.pega_meio_por_tipo(tipo_meio)
         if meio:
-            self.__meios_transporte.remove(meio)
+            self.__meio_transporte_dao.remove(meio)
             self.__tela_meio_transporte.mostra_mensagem(
                 f"Meio de transporte '{meio.tipo}' excluído com sucesso!"
             )

@@ -1,15 +1,15 @@
 from view.tela_itinerario import TelaItinerario
 from model.itinerario import Itinerario
-
+from daos.itinerario_dao import ItinerarioDAO
 
 class ControladorItinerario:
     def __init__(self, controlador_controladores):
-        self.__itinerarios: list[Itinerario] = []
+        self.__itinerario_dao = ItinerarioDAO() 
         self.__tela_itinerario = TelaItinerario()
         self.__controlador_controladores = controlador_controladores
 
     def pega_itinerario_por_codigo_itinerario(self, codigo_itinerario: int) -> Itinerario | None:
-        for itinerario in self.__itinerarios:
+        for itinerario in self.__itinerario_dao.get_all:
             if itinerario.codigo_itinerario == codigo_itinerario:
                 return itinerario
         return None
@@ -37,15 +37,15 @@ class ControladorItinerario:
             self.__tela_itinerario.mostra_mensagem("⚠️ Data inicial não pode ser posterior à data final.")
             return
 
-        self.__itinerarios.append(novo_itinerario)
+        self.__itinerario_dao.add(novo_itinerario)
         self.__tela_itinerario.mostra_mensagem("✅ Itinerário cadastrado com sucesso!")
 
     def listar_itinerarios(self):
-        if not self.__itinerarios:
+        if not self.__itinerario_dao.get_all:
             self.__tela_itinerario.mostra_mensagem("📭 Nenhum itinerário cadastrado.")
             return
 
-        for itinerario in self.__itinerarios:
+        for itinerario in self.__itinerario_dao.get_all:
             self.__tela_itinerario.mostra_itinerario({
                 "codigo_itinerario": itinerario.codigo_itinerario,
                 "origem": itinerario.origem,
@@ -56,7 +56,7 @@ class ControladorItinerario:
             })
 
     def excluir_itinerario(self):
-        if not self.__itinerarios:
+        if not self.__itinerario_dao.get_all:
             self.__tela_itinerario.mostra_mensagem("📭 Nenhum itinerário para excluir.")
             return
 
@@ -66,13 +66,13 @@ class ControladorItinerario:
         itinerario = self.pega_itinerario_por_codigo_itinerario(codigo_itinerario)
 
         if itinerario:
-            self.__itinerarios.remove(itinerario)
+            self.__itinerario_dao.remove(itinerario)
             self.__tela_itinerario.mostra_mensagem("🗑️ Itinerário removido com sucesso!")
         else:
             self.__tela_itinerario.mostra_mensagem("⚠️ Itinerário não encontrado.")
 
     def alterar_itinerario(self):
-        if not self.__itinerarios:
+        if not self.__itinerario_dao.get_all:
             self.__tela_itinerario.mostra_mensagem("📭 Nenhum itinerário para alterar.")
             return
 

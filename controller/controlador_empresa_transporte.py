@@ -1,18 +1,19 @@
 from view.tela_empresa_transporte import TelaEmpresaTransporte
 from model.empresa_transporte import EmpresaTransporte
+from daos.empresa_transporte_dao import EmpresaTransporteDAO
 
 class ControladorEmpresaTransporte:
     def __init__(self, controlador_controladores):
-        self.__empresas = []
+        self.__empresa_dao = EmpresaTransporteDAO()
         self.__tela_empresa = TelaEmpresaTransporte()
         self.__controlador_controladores = controlador_controladores
 
     @property
     def empresas(self):
-        return self.__empresas
+        return self.__empresa_dao.get_all
 
     def pega_empresa_por_cnpj(self, cnpj: str):
-        for empresa in self.__empresas:
+        for empresa in self.__empresa_dao.get_all:
             if empresa.cnpj == cnpj:
                 return empresa
         return None
@@ -27,14 +28,14 @@ class ControladorEmpresaTransporte:
             telefone=dados["telefone"],
             cnpj=dados["cnpj"]
         )
-        self.__empresas.append(empresa)
+        self.__empresa_dao.add(empresa)
         self.__tela_empresa.mostra_mensagem("Empresa cadastrada com sucesso!")
 
     def listar_empresas(self):
-        if not self.__empresas:
+        if not self.__empresa_dao.get_all:
             self.__tela_empresa.mostra_mensagem("Nenhuma empresa cadastrada.")
             return
-        for empresa in self.__empresas:
+        for empresa in self.__empresa_dao.get_all:
             self.__tela_empresa.mostra_empresa({
                 "nome_empresa": empresa.nome_empresa,
                 "telefone": empresa.telefone,
@@ -45,7 +46,7 @@ class ControladorEmpresaTransporte:
         cnpj = self.__tela_empresa.seleciona_empresa()
         empresa = self.pega_empresa_por_cnpj(cnpj)
         if empresa:
-            self.__empresas.remove(empresa)
+            self.__empresa_dao.remove(empresa)
             self.__tela_empresa.mostra_mensagem("Empresa removida com sucesso!")
         else:
             self.__tela_empresa.mostra_mensagem("Empresa não encontrada.")

@@ -1,15 +1,15 @@
 from model.pessoa import Pessoa
 from view.tela_pessoa import TelaPessoa
-
+from daos.pessoa_dao import PessoaDAO
 
 class ControladorPessoa:
     def __init__(self, controlador_controladores):
-        self.__pessoas = []
+        self.__pessoa_dao = PessoaDAO()
         self.__tela_pessoa = TelaPessoa()
         self.__controlador_controladores = controlador_controladores
 
     def pega_pessoa_por_cpf(self, cpf):
-        for pessoa in self.__pessoas:
+        for pessoa in self.__pessoa_dao.get_all:
             if pessoa.cpf == cpf:
                 return pessoa
         return None
@@ -24,7 +24,7 @@ class ControladorPessoa:
                     dados["cpf"],
                     dados["telefone"]
                 )
-                self.__pessoas.append(pessoa)
+                self.__pessoa_dao.add(pessoa)
                 self.__tela_pessoa.mostra_mensagem(
                     "Pessoa cadastrada com sucesso!")
             else:
@@ -54,10 +54,10 @@ class ControladorPessoa:
             self.__tela_pessoa.mostra_mensagem("Pessoa não encontrada.")
 
     def listar_pessoas(self):
-        if not self.__pessoas:
+        if not self.__pessoa_dao.get_all:
             self.__tela_pessoa.mostra_mensagem("Nenhuma pessoa cadastrada.")
         else:
-            for pessoa in self.__pessoas:
+            for pessoa in self.__pessoa_dao.get_all:
                 self.__tela_pessoa.mostra_pessoa({
                     "nome": pessoa.nome,
                     "idade": pessoa.idade,
@@ -71,7 +71,7 @@ class ControladorPessoa:
         pessoa = self.pega_pessoa_por_cpf(cpf)
 
         if pessoa:
-            self.__pessoas.remove(pessoa)
+            self.__pessoa_dao.remove(pessoa)
             self.__tela_pessoa.mostra_mensagem("Pessoa excluída com sucesso!")
         else:
             self.__tela_pessoa.mostra_mensagem("Pessoa não encontrada.")

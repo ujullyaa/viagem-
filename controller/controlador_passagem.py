@@ -2,10 +2,11 @@ from view.tela_passagem import TelaPassagem
 from model.passagem import Passagem
 from model.pessoa import Pessoa
 from model.meio_transporte import MeioTransporte
+from dao.passagem_dao import PassagemDAO
 
 class ControladorPassagem:
     def __init__(self, controlador_controladores, controlador_itinerario, controlador_pessoa, controlador_meio_transporte):
-        self.__passagens: list[Passagem] = []
+        self.__passagem_dao = PassagemDAO()
         self.__tela_passagem = TelaPassagem()
         self.__controlador_controladores = controlador_controladores
         self.__controlador_itinerario = controlador_itinerario
@@ -13,7 +14,7 @@ class ControladorPassagem:
         self.__controlador_meio_transporte = controlador_meio_transporte
 
     def pega_passagem_por_numero(self, numero: int) -> Passagem | None:
-        for passagem in self.__passagens:
+        for passagem in self.__passagem_dao.get_all:
             if passagem.numero == numero:
                 return passagem
         return None
@@ -64,17 +65,17 @@ class ControladorPassagem:
         )
 
         # Adiciona a passagem nas listas corretas
-        self.__passagens.append(nova_passagem)
+        self.__passagem_dao.add(nova_passagem)
         itinerario.passagem.append(nova_passagem)
 
         self.__tela_passagem.mostra_mensagem("✅ Passagem cadastrada com sucesso!")
 
     def listar_passagens(self):
-        if not self.__passagens:
+        if not self.__passagem_dao.get_all:
             self.__tela_passagem.mostra_mensagem("📭 Nenhuma passagem cadastrada.")
             return
 
-        for passagem in self.__passagens:
+        for passagem in self.__passagem_dao.get_all:
             self.__tela_passagem.mostra_passagem({
                 "numero": passagem.numero,
                 "assento": passagem.assento,
@@ -85,7 +86,7 @@ class ControladorPassagem:
             })
 
     def alterar_passagem(self):
-        if not self.__passagens:
+        if not self.__passagem_dao.get_all:
             self.__tela_passagem.mostra_mensagem("📭 Nenhuma passagem para alterar.")
             return
 
@@ -123,7 +124,7 @@ class ControladorPassagem:
         self.__tela_passagem.mostra_mensagem("✅ Passagem alterada com sucesso!")
 
     def excluir_passagem(self):
-        if not self.__passagens:
+        if not self.__passagem_dao.get_all:
             self.__tela_passagem.mostra_mensagem("📭 Nenhuma passagem para excluir.")
             return
 
@@ -140,7 +141,7 @@ class ControladorPassagem:
                 itinerario.passagem.remove(passagem)
 
         # Remove da lista principal
-        self.__passagens.remove(passagem)
+        self.__passagem_dao.remove(passagem)
         self.__tela_passagem.mostra_mensagem("🗑️ Passagem excluída com sucesso!")
 
     def retornar(self):
