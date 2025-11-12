@@ -6,17 +6,18 @@ class PessoaDAO(DAO):
         super().__init__('pessoa.pkl')
 
     def add(self, pessoa: Pessoa):
-        if pessoa is not None and isinstance(pessoa, Pessoa):
+        if pessoa is not None:
             super().add(pessoa.cpf, pessoa)
 
     def update(self, pessoa: Pessoa):
-        if pessoa is not None and isinstance(pessoa, Pessoa):
+        if pessoa is not None:
             super().update(pessoa.cpf, pessoa)
 
-    def get(self, key: str):
-        if isinstance(key, str):
-            return super().get(key)
+    def get(self, cpf: str):
+        return super().get(cpf)
 
-    def remove(self, key: str):
-        if isinstance(key, str):
-            return super().remove(key)
+    def remove(self, cpf: str):
+        super().remove(cpf)
+
+    def get_all(self):
+        return list(super().get_all())

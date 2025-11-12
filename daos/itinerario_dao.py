@@ -6,17 +6,18 @@ class ItinerarioDAO(DAO):
         super().__init__('itinerario.pkl')
 
     def add(self, itinerario: Itinerario):
-        if itinerario and isinstance(itinerario, Itinerario) and isinstance(itinerario.codigo_itinerario, int):
+        if itinerario is not None:
             super().add(itinerario.codigo_itinerario, itinerario)
 
     def update(self, itinerario: Itinerario):
-        if itinerario and isinstance(itinerario, Itinerario) and isinstance(itinerario.codigo_itinerario, int):
+        if itinerario is not None:
             super().update(itinerario.codigo_itinerario, itinerario)
 
-    def get(self, key: int):
-        if isinstance(key, int):
-            return super().get(key)
+    def get(self, codigo_itinerario: int):
+        return super().get(codigo_itinerario)
 
-    def remove(self, key: int):
-        if isinstance(key, int):
-            return super().remove(key)
+    def remove(self, codigo_itinerario: int):
+        super().remove(codigo_itinerario)
+
+    def get_all(self):
+        return list(super().get_all())

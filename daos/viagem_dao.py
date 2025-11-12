@@ -6,17 +6,18 @@ class ViagemDAO(DAO):
         super().__init__('viagem.pkl')
 
     def add(self, viagem: Viagem):
-        if((viagem is not None) and isinstance(viagem, Viagem) and isinstance(viagem.codigo, str)):
-            super().add(viagem.codigo, viagem)
+        if viagem is not None:
+            super().add(viagem.codigo_viagem, viagem)
 
     def update(self, viagem: Viagem):
-        if((viagem is not None) and isinstance(viagem, Viagem) and isinstance(viagem.codigo, str)):
-            super().update(viagem.codigo, viagem)
+        if viagem is not None:
+            super().update(viagem.codigo_viagem, viagem)
 
-    def get(self, key: str):
-        if isinstance(key, str):
-            return super().get(key)
+    def get(self, codigo_viagem: int):
+        return super().get(codigo_viagem)
 
-    def remove(self, key: str):
-        if(isinstance(key, str)):
-            return super().remove(key)
+    def remove(self, codigo_viagem: int):
+        super().remove(codigo_viagem)
+
+    def get_all(self):
+        return list(super().get_all())

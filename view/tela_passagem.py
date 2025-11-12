@@ -1,98 +1,90 @@
+# view/tela_passagem.py
 import FreeSimpleGUI as sg
 
 class TelaPassagem:
-    def __init__(self):
-        pass
-
     def tela_opcoes(self):
         layout = [
-            [sg.Text("Menu de Passagens", font=("Helvetica", 15))],
-            [sg.Button("Incluir Passagem", key=1)],
-            [sg.Button("Alterar Passagem", key=2)],
-            [sg.Button("Listar Passagens", key=3)],
-            [sg.Button("Excluir Passagem", key=4)],
-            [sg.Button("Voltar ao Menu Principal", key=0)]
+            [sg.Text("🎫  Menu de Passagens", font=("Segoe UI", 18, "bold"))],
+            [sg.HorizontalSeparator()],
+            [sg.Button("1 - Incluir Passagem")],
+            [sg.Button("2 - Alterar Passagem")],
+            [sg.Button("3 - Listar Passagens")],
+            [sg.Button("4 - Excluir Passagem")],
+            [sg.Button("0 - Voltar ao Menu Principal", button_color=("white", "red"))]
         ]
 
         window = sg.Window("Menu Passagens", layout)
         event, _ = window.read()
         window.close()
 
-        if event in (sg.WINDOW_CLOSED, 0):
+        if event in (sg.WINDOW_CLOSED, "0 - Voltar ao Menu Principal"):
             return 0
-        elif event == 1:
+        elif event == "1 - Incluir Passagem":
             return 1
-        elif event == 2:
+        elif event == "2 - Alterar Passagem":
             return 2
-        elif event == 3:
+        elif event == "3 - Listar Passagens":
             return 3
-        elif event == 4:
+        elif event == "4 - Excluir Passagem":
             return 4
-        return 0
+        return -1
 
     def pega_dados_passagem(self):
         layout = [
-            [sg.Text("Código da Passagem:"), sg.Input(key="codigo")],
-            [sg.Text("Origem:"), sg.Input(key="origem")],
-            [sg.Text("Destino:"), sg.Input(key="destino")],
-            [sg.Text("Data da Viagem:"), sg.Input(key="data")],
-            [sg.Text("Preço (R$):"), sg.Input(key="preco")],
-            [sg.Button("Confirmar"), sg.Button("Cancelar")]
+            [sg.Text("🎫  Cadastro de Passagem", font=("Segoe UI", 18, "bold"))],
+            [sg.HorizontalSeparator()],
+            [sg.Text("Número da Passagem:"), sg.Input(key="numero")],
+            [sg.Text("Assento:"), sg.Input(key="assento")],
+            [sg.Text("Data da Viagem (dd/mm/aaaa):"), sg.Input(key="data_viagem")],
+            [sg.Text("Valor (R$):"), sg.Input(key="valor")],
+            [sg.Text("Código da Pessoa:"), sg.Input(key="pessoa")],
+            [sg.Text("Código do Meio de Transporte:"), sg.Input(key="meio_transporte")],
+            [sg.HorizontalSeparator()],
+            [
+                sg.Button("💾  Confirmar", key="confirmar", button_color=("white", "green")),
+                sg.Button("↩️  Cancelar", key="cancelar", button_color=("white", "gray"))
+            ]
         ]
 
         window = sg.Window("Cadastro de Passagem", layout)
         event, values = window.read()
         window.close()
 
-        if event == "Confirmar":
+        if event == "confirmar":
             return {
-                "codigo": values["codigo"],
-                "origem": values["origem"],
-                "destino": values["destino"],
-                "data": values["data"],
-                "preco": values["preco"]
+                "numero": values.get("numero", "").strip(),
+                "assento": values.get("assento", "").strip(),
+                "data_viagem": values.get("data_viagem", "").strip(),
+                "valor": values.get("valor", "").strip(),
+                "pessoa": values.get("pessoa", "").strip(),
+                "meio_transporte": values.get("meio_transporte", "").strip()
             }
         return None
 
     def mostra_passagem(self, dados):
-        sg.popup(
-            f"Código: {dados['codigo']}\n"
-            f"Origem: {dados['origem']}\n"
-            f"Destino: {dados['destino']}\n"
-            f"Data: {dados['data']}\n"
-            f"Preço: R$ {dados['preco']}",
-            title="Passagem"
+        texto = (
+            f"🎫 Número: {dados.get('numero', '')}\n"
+            f"💺 Assento: {dados.get('assento', '')}\n"
+            f"📅 Data da Viagem: {dados.get('data_viagem', '')}\n"
+            f"💰 Valor: {dados.get('valor', '')}\n"
+            f"🧑 Pessoa: {dados.get('pessoa', '')}\n"
+            f"🚌 Meio de Transporte: {dados.get('meio_transporte', '')}"
         )
+        sg.popup_scrolled(texto, title="📋 Passagem", font=("Segoe UI", 11))
 
-    def mostra_passagens(self, passagens):
-        if not passagens:
-            sg.popup("Nenhuma passagem cadastrada.")
-            return
-        texto = ""
-        for p in passagens:
-            texto += (
-                f"Código: {p['codigo']}\n"
-                f"Origem: {p['origem']}\n"
-                f"Destino: {p['destino']}\n"
-                f"Data: {p['data']}\n"
-                f"Preço: R$ {p['preco']}\n\n"
-            )
-        sg.popup_scrolled(texto, title="Passagens Cadastradas")
+    def mostra_mensagem(self, msg):
+        sg.popup(msg, title="Mensagem", font=("Segoe UI", 11))
 
     def seleciona_passagem(self):
         layout = [
-            [sg.Text("Digite o código da passagem:")],
-            [sg.Input(key="codigo")],
-            [sg.Button("Confirmar"), sg.Button("Cancelar")]
+            [sg.Text("Digite o número da passagem:")],
+            [sg.Input(key="numero")],
+            [sg.Button("Confirmar", key="confirmar"), sg.Button("Cancelar", key="cancelar")]
         ]
-
         window = sg.Window("Selecionar Passagem", layout)
         event, values = window.read()
         window.close()
 
-        if event == "Confirmar":
-            return values["codigo"]
+        if event == "confirmar":
+            return values.get("numero", "").strip()
         return None
-
-    def mostra_mensagem(self, msg):
-        sg.popup(msg)

@@ -5,22 +5,19 @@ class MeioTransporteDAO(DAO):
     def __init__(self):
         super().__init__('meio_transporte.pkl')
 
-    def add(self, meio_transporte: MeioTransporte):
-        
-        if meio_transporte and isinstance(meio_transporte, MeioTransporte) and isinstance(meio_transporte.tipo, str):
-            super().add(meio_transporte.tipo.lower().strip(), meio_transporte)
+    def add(self, meio: MeioTransporte):
+        if meio is not None:
+            super().add(meio.codigo, meio)
 
-    def update(self, meio_transporte: MeioTransporte):
-        
-        if meio_transporte and isinstance(meio_transporte, MeioTransporte) and isinstance(meio_transporte.tipo, str):
-            super().update(meio_transporte.tipo.lower().strip(), meio_transporte)
+    def update(self, meio: MeioTransporte):
+        if meio is not None:
+            super().update(meio.codigo, meio)
 
-    def get(self, key: str):
-       
-        if isinstance(key, str):
-            return super().get(key.lower().strip())
+    def get(self, codigo: str):
+        return super().get(codigo)
 
-    def remove(self, key: str):
-       
-        if isinstance(key, str):
-            return super().remove(key.lower().strip())
+    def remove(self, codigo: str):
+        super().remove(codigo)
+
+    def get_all(self):
+        return list(super().get_all())
