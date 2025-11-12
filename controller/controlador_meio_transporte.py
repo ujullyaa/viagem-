@@ -1,6 +1,6 @@
 from view.tela_meio_transporte import TelaMeioTransporte
 from model.meio_transporte import MeioTransporte
-from dao.itinerario_dao import ItinerarioDAO
+from daos.itinerario_dao import ItinerarioDAO
 
 class ControladorMeioTransporte:
     def __init__(self, controlador_controladores, controlador_empresa_transporte):

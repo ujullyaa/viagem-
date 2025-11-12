@@ -1,7 +1,7 @@
 from view.tela_viagem import TelaViagem
 from model.viagem import Viagem
 from model.pessoa import Pessoa
-from viajem import ViagemDAO
+from daos.viagem_dao import ViagemDAO
 
 class ControladorViagem:
     def __init__(self, controlador_controladores):

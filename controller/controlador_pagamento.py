@@ -1,7 +1,7 @@
 from view.tela_pagamento import TelaPagamento
 from model.pagamento import Cartao, pix, Cedula
 from random import randint
-from pagamento_dao import PagamentoDAO
+from daos.pagamento_dao import PagamentoDAO
 
 class ControladorPagamento:
     def __init__(self, controlador_controladores):
