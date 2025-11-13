@@ -13,9 +13,16 @@ class ControladorItinerario:
         return self.__itinerario_dao.get_all()
 
     def pega_itinerario_por_codigo(self, codigo):
+        # Aceita `codigo` como int ou str vindo da interface
         for itin in self.__itinerario_dao.get_all():
-            if itin.codigo_itinerario == codigo:
-                return itin
+            try:
+                # comparar como inteiro quando possível
+                if int(itin.codigo_itinerario) == int(codigo):
+                    return itin
+            except Exception:
+                # fallback para comparação de string
+                if str(itin.codigo_itinerario) == str(codigo):
+                    return itin
         return None
 
     def incluir_itinerario(self):
@@ -44,7 +51,23 @@ class ControladorItinerario:
         self.__tela_itinerario.mostra_mensagem("✅ Itinerário cadastrado com sucesso!")
 
     def alterar_itinerario(self):
-        codigo = self.__tela_itinerario.seleciona_itinerario()
+        # Mostrar todos os itinerários cadastrados para facilitar a escolha
+        itinerarios = self.__itinerario_dao.get_all()
+        if not itinerarios:
+            self.__tela_itinerario.mostra_mensagem("Nenhum itinerário cadastrado.")
+            return
+
+        lista_itinerarios = []
+        for itin in itinerarios:
+            lista_itinerarios.append({
+                "codigo_itinerario": itin.codigo_itinerario,
+                "origem": itin.origem,
+                "destino": itin.destino,
+                "data_inicio": itin.data_inicio,
+                "data_fim": itin.data_fim
+            })
+
+        codigo = self.__tela_itinerario.mostra_itinerario(lista_itinerarios)
         if not codigo:
             self.__tela_itinerario.mostra_mensagem("Operação cancelada.")
             return
@@ -77,8 +100,10 @@ class ControladorItinerario:
             self.__tela_itinerario.mostra_mensagem("Nenhum itinerário cadastrado.")
             return
 
+        # Construir lista de dicionários e mostrar todos de uma vez
+        lista_itinerarios = []
         for itin in itinerarios:
-            self.__tela_itinerario.mostra_itinerario({
+            lista_itinerarios.append({
                 "codigo_itinerario": itin.codigo_itinerario,
                 "origem": itin.origem,
                 "destino": itin.destino,
@@ -86,15 +111,33 @@ class ControladorItinerario:
                 "data_fim": itin.data_fim
             })
 
+        self.__tela_itinerario.mostra_itinerario(lista_itinerarios)
+
     def excluir_itinerario(self):
-        codigo = self.__tela_itinerario.seleciona_itinerario()
+        # Mostrar todos os itinerários cadastrados para facilitar a escolha
+        itinerarios = self.__itinerario_dao.get_all()
+        if not itinerarios:
+            self.__tela_itinerario.mostra_mensagem("Nenhum itinerário cadastrado.")
+            return
+
+        lista_itinerarios = []
+        for itin in itinerarios:
+            lista_itinerarios.append({
+                "codigo_itinerario": itin.codigo_itinerario,
+                "origem": itin.origem,
+                "destino": itin.destino,
+                "data_inicio": itin.data_inicio,
+                "data_fim": itin.data_fim
+            })
+
+        codigo = self.__tela_itinerario.mostra_itinerario(lista_itinerarios)
         if not codigo:
             self.__tela_itinerario.mostra_mensagem("Operação cancelada.")
             return
 
         itinerario = self.pega_itinerario_por_codigo(codigo)
         if itinerario:
-            self.__itinerario_dao.remove(itinerario)
+            self.__itinerario_dao.remove(itinerario.codigo_itinerario)
             self.__tela_itinerario.mostra_mensagem("Itinerário removido com sucesso!")
         else:
             self.__tela_itinerario.mostra_mensagem("Itinerário não encontrado.")

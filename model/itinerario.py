@@ -2,7 +2,7 @@ from datetime import datetime
 
 class Itinerario:
     def __init__(self, codigo_itinerario: int, origem: str, destino: str,
-                 data_inicio: str, data_fim: str, passagens=None):
+                data_inicio: str, data_fim: str, passagens=None):
         self.__codigo_itinerario = codigo_itinerario
         self.__origem = origem
         self.__destino = destino
