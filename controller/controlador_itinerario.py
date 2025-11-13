@@ -118,7 +118,7 @@ class ControladorItinerario:
             2: self.alterar_itinerario,
             3: self.listar_itinerarios,
             4: self.excluir_itinerario,
-            5: self.retornar
+            0: self.retornar
         }
 
         while True:
@@ -126,7 +126,7 @@ class ControladorItinerario:
             funcao = opcoes.get(escolha)
             if funcao:
                 funcao()
-                if escolha == 5:
+                if escolha == 0:
                     break
             else:
                 self.__tela_itinerario.mostra_mensagem("Opção inválida.")

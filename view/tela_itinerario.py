@@ -13,8 +13,10 @@ class TelaItinerario:
             [sg.Button("0 - Voltar ao Menu Principal", button_color=("white", "red"))]
         ]
         window = sg.Window("Menu Itinerário", layout, element_justification="center")
-        event, _ = window.read()
+        result = window.read()
         window.close()
+        event = result[0] if result else sg.WINDOW_CLOSED
+        _ = result[1] if result else None
 
         if event in (sg.WINDOW_CLOSED, "0 - Voltar ao Menu Principal"):
             return 0
@@ -28,22 +30,34 @@ class TelaItinerario:
             return 4
         return -1
 
-    def pega_dados_itinerario(self):
+    def pega_dados_itinerario(self, itinerario=None):
+        codigo_default = itinerario.codigo_itinerario if itinerario else ""
+        origem_default = itinerario.origem if itinerario else ""
+        destino_default = itinerario.destino if itinerario else ""
+        data_inicio_default = itinerario.data_inicio if itinerario else ""
+        data_fim_default = itinerario.data_fim if itinerario else ""
+        
         layout = [
             [sg.Text("🗺️ Cadastro de Itinerário", font=("Segoe UI", 18, "bold"))],
             [sg.HorizontalSeparator()],
-            [sg.Text("Código do Itinerário:", size=(18,1)), sg.Input(key="codigo_itinerario")],
-            [sg.Text("Origem:", size=(18,1)), sg.Input(key="origem")],
-            [sg.Text("Destino:", size=(18,1)), sg.Input(key="destino")],
-            [sg.Text("Data de Início (DD/MM/AAAA):", size=(18,1)), sg.Input(key="data_inicio")],
-            [sg.Text("Data de Fim (DD/MM/AAAA):", size=(18,1)), sg.Input(key="data_fim")],
+            [sg.Text("Código do Itinerário:", size=(18,1)), sg.Input(default_text=codigo_default, key="codigo_itinerario", disabled=itinerario is not None)],
+            [sg.Text("Origem:", size=(18,1)), sg.Input(default_text=origem_default, key="origem")],
+            [sg.Text("Destino:", size=(18,1)), sg.Input(default_text=destino_default, key="destino")],
+            [sg.Text("Data de Início (DD/MM/AAAA):", size=(18,1)), sg.Input(default_text=data_inicio_default, key="data_inicio")],
+            [sg.Text("Data de Fim (DD/MM/AAAA):", size=(18,1)), sg.Input(default_text=data_fim_default, key="data_fim")],
             [sg.HorizontalSeparator()],
             [sg.Button("💾 Confirmar", key="confirmar"), sg.Button("↩️ Cancelar", key="cancelar")]
         ]
         window = sg.Window("Cadastro/Alteração de Itinerário", layout)
-        event, values = window.read()
+        result = window.read()
         window.close()
+        
+        event = result[0] if result else sg.WINDOW_CLOSED
+        values = result[1] if result else None
 
+        if values is None or event in (sg.WINDOW_CLOSED, "cancelar"):
+            return None
+            
         if event == "confirmar":
             return {
                 "codigo_itinerario": values.get("codigo_itinerario", "").strip(),
@@ -72,9 +86,15 @@ class TelaItinerario:
             [sg.Button("Confirmar", key="confirmar"), sg.Button("Cancelar", key="cancelar")]
         ]
         window = sg.Window("Selecionar Itinerário", layout)
-        event, values = window.read()
+        result = window.read()
         window.close()
+        
+        event = result[0] if result else sg.WINDOW_CLOSED
+        values = result[1] if result else None
 
+        if values is None or event in (sg.WINDOW_CLOSED, "cancelar"):
+            return None
+            
         if event == "confirmar":
             return values.get("codigo_itinerario", "").strip()
         return None

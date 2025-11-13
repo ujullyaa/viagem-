@@ -13,8 +13,11 @@ class TelaEmpresaTransporte:
             [sg.Button("0 - Voltar ao Menu Principal", button_color=("white", "red"))],
         ]
         window = sg.Window("Menu Empresa de Transporte", layout)
-        event, _ = window.read()
+        result = window.read()
         window.close()
+        
+        event = result[0] if result else sg.WINDOW_CLOSED
+        _ = result[1] if result else None
 
         if event in (sg.WINDOW_CLOSED, "0 - Voltar ao Menu Principal"):
             return 0
@@ -40,10 +43,13 @@ class TelaEmpresaTransporte:
             [sg.Button("💾 Confirmar", key="confirmar"), sg.Button("↩️ Cancelar", key="cancelar")]
         ]
         window = sg.Window("Cadastro de Empresa", layout)
-        event, values = window.read()
+        result = window.read()
         window.close()
+        
+        event = result[0] if result else sg.WINDOW_CLOSED
+        values = result[1] if result else None
 
-        if event == "confirmar":
+        if event == "confirmar" and values:
             return {
                 "nome_empresa": values.get("nome_empresa", "").strip(),
                 "cnpj": values.get("cnpj", "").strip(),
@@ -51,20 +57,18 @@ class TelaEmpresaTransporte:
             }
         return None
 
-    def mostra_empresa(self, dados_empresa):
-        texto = (
-            f"🏢 Nome: {dados_empresa.get('nome_empresa', '(não informado)')}\n"
-            f"📞 Telefone: {dados_empresa.get('telefone', '(não informado)')}\n"
-            f"🧾 CNPJ: {dados_empresa.get('cnpj', '(não informado)')}"
-        )
-        sg.popup_scrolled(texto, title="Empresa", font=("Segoe UI", 11))
-
-    def mostra_empresas(self, empresas):
+    def mostra_empresa(self, empresas):
+        """Mostra uma ou várias empresas."""
         if not empresas:
             sg.popup("Nenhuma empresa cadastrada.", title="Empresas", font=("Segoe UI", 11))
             return
+        
+        # Se receber um dicionário, converte para lista
+        if isinstance(empresas, dict):
+            empresas = [empresas]
+        
         texto = "\n\n".join([
-            f"🏢 {e.get('nome_empresa','')}\n📞 {e.get('telefone','')}\n🧾 CNPJ: {e.get('cnpj','')}"
+            f"🏢 Nome: {e.get('nome_empresa','')}\n📞 Telefone: {e.get('telefone','')}\n🧾 CNPJ: {e.get('cnpj','')}"
             for e in empresas
         ])
         sg.popup_scrolled(texto, title="Empresas Cadastradas", font=("Segoe UI", 11))
@@ -81,10 +85,13 @@ class TelaEmpresaTransporte:
             [sg.Button("Confirmar"), sg.Button("Cancelar")]
         ]
         window = sg.Window("Selecionar Empresa", layout)
-        event, values = window.read()
+        result = window.read()
         window.close()
+        
+        event = result[0] if result else sg.WINDOW_CLOSED
+        values = result[1] if result else None
 
-        if event == "Confirmar" and values["empresa"]:
+        if event == "Confirmar" and values and values.get("empresa"):
             return values["empresa"][0].split(" - ")[1]  # retorna apenas o CNPJ
         return None
 

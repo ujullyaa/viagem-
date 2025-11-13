@@ -66,7 +66,7 @@ class ControladorEmpresaTransporte:
     def listar_empresas(self):
         empresas = self.__empresa_dao.get_all()
         lista = [{"nome_empresa": e.nome_empresa, "telefone": e.telefone, "cnpj": e.cnpj} for e in empresas]
-        self.__tela_empresa.mostra_empresas(lista)
+        self.__tela_empresa.mostra_empresa(lista)
 
     def alterar_empresa(self):
         empresas = self.__empresa_dao.get_all()
