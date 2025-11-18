@@ -16,23 +16,18 @@ class TelaPagamento:
         window = sg.Window("Menu Pagamento", layout)
         event, _ = window.read()
         window.close()
-
-        if event in (sg.WINDOW_CLOSED, 0):
-            return 0
-        elif event == 1:
-            return 1
-        elif event == 2:
-            return 2
-        elif event == 3:
-            return 3
-        return 0
+        return event if event in (0, 1, 2, 3) else 0
 
     def pega_dados_pagamento(self):
         layout = [
-            [sg.Text("Código do Pagamento:"), sg.Input(key="codigo")],
-            [sg.Text("Forma de Pagamento:"), sg.Combo(["Cartão", "Dinheiro", "Pix"], key="forma", readonly=True)],
-            [sg.Text("Valor (R$):"), sg.Input(key="valor")],
-            [sg.Text("Status:"), sg.Combo(["Pendente", "Concluído"], key="status", readonly=True)],
+            [sg.Text("CPF do Passageiro:"), sg.Input(key="cpf_passageiro")],
+            [sg.Text("Valor Total (R$):"), sg.Input(key="valor_total")],
+            [sg.Text("Data (DD/MM/AAAA):"), sg.Input(key="data")],
+            [sg.Text("Pagou?"), sg.Combo(["Sim", "Não"], key="pagou", readonly=True)],
+
+            [sg.Text("Forma de Pagamento:")],
+            [sg.Combo(["cartao", "pix", "cedulas"], key="forma_pagamento", readonly=True)],
+
             [sg.Button("Confirmar"), sg.Button("Cancelar")]
         ]
 
@@ -42,35 +37,52 @@ class TelaPagamento:
 
         if event == "Confirmar":
             return {
-                "codigo": values["codigo"],
-                "forma": values["forma"],
-                "valor": values["valor"],
-                "status": values["status"]
+                "cpf_passageiro": values["cpf_passageiro"],
+                "valor_total": values["valor_total"],
+                "data": values["data"],
+                "pagou": values["pagou"] == "Sim",
+                "forma_pagamento": values["forma_pagamento"]
             }
         return None
+
+    def pega_dados_cartao(self):
+        layout = [
+            [sg.Text("Número do Cartão:"), sg.Input(key="numero_cartao")],
+            [sg.Text("Validade:"), sg.Input(key="validade")],
+            [sg.Text("Bandeira:"), sg.Input(key="bandeira")],
+            [sg.Text("Nome do Titular:"), sg.Input(key="nome_titular")],
+            [sg.Button("Confirmar"), sg.Button("Cancelar")]
+        ]
+
+        window = sg.Window("Dados do Cartão", layout)
+        event, values = window.read()
+        window.close()
+
+        return values if event == "Confirmar" else None
+
+    def pega_dados_pix(self):
+        layout = [
+            [sg.Text("Chave Pix:"), sg.Input(key="chave_pix")],
+            [sg.Text("Banco:"), sg.Input(key="banco")],
+            [sg.Button("Confirmar"), sg.Button("Cancelar")]
+        ]
+
+        window = sg.Window("Dados Pix", layout)
+        event, values = window.read()
+        window.close()
+
+        return values if event == "Confirmar" else None
 
     def mostra_pagamento(self, dados):
         sg.popup(
             f"Código: {dados['codigo']}\n"
-            f"Forma: {dados['forma']}\n"
-            f"Valor: R$ {dados['valor']}\n"
-            f"Status: {dados['status']}",
+            f"Forma: {dados['forma_pagamento']}\n"
+            f"Valor: R$ {dados['valor_total']}\n"
+            f"Data: {dados['data']}\n"
+            f"Pagou: {dados['pagou']}\n"
+            f"Passageiro: {dados['passageiro']}",
             title="Pagamento"
         )
-
-    def mostra_pagamentos(self, pagamentos):
-        if not pagamentos:
-            sg.popup("Nenhum pagamento cadastrado.")
-            return
-        texto = ""
-        for p in pagamentos:
-            texto += (
-                f"Código: {p['codigo']}\n"
-                f"Forma: {p['forma']}\n"
-                f"Valor: R$ {p['valor']}\n"
-                f"Status: {p['status']}\n\n"
-            )
-        sg.popup_scrolled(texto, title="Pagamentos Cadastrados")
 
     def seleciona_pagamento(self):
         layout = [
@@ -83,9 +95,7 @@ class TelaPagamento:
         event, values = window.read()
         window.close()
 
-        if event == "Confirmar":
-            return values["codigo"]
-        return None
+        return int(values["codigo"]) if event == "Confirmar" else None
 
     def mostra_mensagem(self, msg):
         sg.popup(msg)

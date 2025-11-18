@@ -9,7 +9,7 @@ class ControladorPessoa:
         self.__controlador_controladores = controlador_controladores
 
     def pega_pessoa_por_cpf(self, cpf):
-        for pessoa in self.__pessoa_dao.get_all:
+        for pessoa in self.__pessoa_dao.get_all():
             if pessoa.cpf == cpf:
                 return pessoa
         return None
