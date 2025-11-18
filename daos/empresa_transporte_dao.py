@@ -37,4 +37,5 @@ class EmpresaTransporteDAO(DAO):
         super().remove(cnpj)
 
     def get_all(self):
+        # ✔️ Agora funciona perfeitamente
         return list(super().get_all())

@@ -1,27 +1,36 @@
-# view/tela_empresa_transporte.py
 import FreeSimpleGUI as sg
 
 class TelaEmpresaTransporte:
+
     def tela_opcoes(self):
         layout = [
-            [sg.Text("🏢  Menu Empresa de Transporte", font=("Segoe UI", 16, "bold"))],
-            [sg.HorizontalSeparator()],
-            [sg.Button("1 - Cadastrar Empresa")],
-            [sg.Button("2 - Alterar Empresa")],
-            [sg.Button("3 - Listar Empresas")],
-            [sg.Button("4 - Excluir Empresa")],
-            [sg.Button("0 - Voltar ao Menu Principal", button_color=("white", "red"))],
+            [sg.Column(
+                [
+                    [sg.Text("🏢 Menu Empresa de Transporte", font=("Segoe UI", 18, "bold"))],
+                    [sg.HorizontalSeparator()],
+                    [sg.Button("1 - Incluir Empresa", size=(35, 1))],
+                    [sg.Button("2 - Alterar Empresa", size=(35, 1))],
+                    [sg.Button("3 - Listar Empresas", size=(35, 1))],
+                    [sg.Button("4 - Excluir Empresa", size=(35, 1))],
+                    [sg.Button("0 - Voltar ao Menu Principal", button_color=("white", "red"), size=(35, 1))]
+                ],
+                element_justification="center",
+                expand_x=True
+            )]
         ]
-        window = sg.Window("Menu Empresa de Transporte", layout)
-        result = window.read()
+
+        window = sg.Window(
+            "Menu Empresa",
+            layout,
+            element_justification="center"
+        )
+
+        event, values = window.read()
         window.close()
-        
-        event = result[0] if result else sg.WINDOW_CLOSED
-        _ = result[1] if result else None
 
         if event in (sg.WINDOW_CLOSED, "0 - Voltar ao Menu Principal"):
             return 0
-        elif event == "1 - Cadastrar Empresa":
+        elif event == "1 - Incluir Empresa":
             return 1
         elif event == "2 - Alterar Empresa":
             return 2
@@ -31,69 +40,104 @@ class TelaEmpresaTransporte:
             return 4
         return -1
 
-    def pega_dados_empresa(self, empresa=None):
-        """Se receber empresa, preenche os campos para alteração."""
-        layout = [
-            [sg.Text("🏢 Cadastro de Empresa", font=("Segoe UI", 16, "bold"))],
-            [sg.HorizontalSeparator()],
-            [sg.Text("Nome da Empresa:", size=(18,1)), sg.Input(default_text=(empresa.nome_empresa if empresa else ""), key="nome_empresa")],
-            [sg.Text("CNPJ:", size=(18,1)), sg.Input(default_text=(empresa.cnpj if empresa else ""), key="cnpj")],
-            [sg.Text("Telefone:", size=(18,1)), sg.Input(default_text=(empresa.telefone if empresa else ""), key="telefone")],
-            [sg.HorizontalSeparator()],
-            [sg.Button("💾 Confirmar", key="confirmar"), sg.Button("↩️ Cancelar", key="cancelar")]
-        ]
-        window = sg.Window("Cadastro de Empresa", layout)
-        result = window.read()
-        window.close()
-        
-        event = result[0] if result else sg.WINDOW_CLOSED
-        values = result[1] if result else None
 
-        if event == "confirmar" and values:
+    def pega_dados_empresa(self, empresa=None):
+        nome_default = empresa.nome_empresa if empresa else ""
+        cnpj_default = empresa.cnpj if empresa else ""
+        telefone_default = empresa.telefone if empresa else ""
+
+        layout = [
+            [sg.Text("🏢 Cadastro de Empresa", font=("Segoe UI", 18, "bold"))],
+            [sg.HorizontalSeparator()],
+            [sg.Text("Nome da Empresa:", size=(18, 1)), 
+            sg.Input(default_text=nome_default, key="nome", size=(45, 1))],
+
+            [sg.Text("CNPJ:", size=(18, 1)), 
+            sg.Input(default_text=cnpj_default, key="cnpj", disabled=empresa is not None, size=(45, 1))],
+
+            [sg.Text("Telefone:", size=(18, 1)), 
+            sg.Input(default_text=telefone_default, key="telefone", size=(45, 1))],
+
+            [sg.HorizontalSeparator()],
+            [sg.Button("💾 Confirmar", key="confirmar", size=(18, 1)),
+            sg.Button("↩️ Cancelar", key="cancelar", size=(18, 1))]
+        ]
+
+        window = sg.Window(
+            "Cadastro/Alteração de Empresa",
+            layout,
+            element_justification="center",
+            finalize=True
+        )
+
+        event, values = window.read()
+        window.close()
+
+        if values is None or event in (sg.WINDOW_CLOSED, "cancelar"):
+            return None
+
+        if event == "confirmar":
             return {
-                "nome_empresa": values.get("nome_empresa", "").strip(),
+                "nome": values.get("nome", "").strip(),
                 "cnpj": values.get("cnpj", "").strip(),
-                "telefone": values.get("telefone", "").strip(),
+                "telefone": values.get("telefone", "").strip()
             }
         return None
 
-    def mostra_empresa(self, empresas):
-        """Mostra uma ou várias empresas."""
-        if not empresas:
-            sg.popup("Nenhuma empresa cadastrada.", title="Empresas", font=("Segoe UI", 11))
-            return
-        
-        # Se receber um dicionário, converte para lista
-        if isinstance(empresas, dict):
-            empresas = [empresas]
-        
-        texto = "\n\n".join([
-            f"🏢 Nome: {e.get('nome_empresa','')}\n📞 Telefone: {e.get('telefone','')}\n🧾 CNPJ: {e.get('cnpj','')}"
-            for e in empresas
-        ])
-        sg.popup_scrolled(texto, title="Empresas Cadastradas", font=("Segoe UI", 11))
 
-    def seleciona_empresa_lista(self, empresas):
-        """Mostra uma lista de empresas para selecionar pelo CNPJ."""
-        if not empresas:
-            sg.popup("Nenhuma empresa cadastrada.", title="Selecionar Empresa")
-            return None
-        lista = [f"{e.nome_empresa} - {e.cnpj}" for e in empresas]
-        layout = [
-            [sg.Text("Selecione a empresa:")],
-            [sg.Listbox(values=lista, size=(40, 10), key="empresa")],
-            [sg.Button("Confirmar"), sg.Button("Cancelar")]
-        ]
-        window = sg.Window("Selecionar Empresa", layout)
-        result = window.read()
-        window.close()
-        
-        event = result[0] if result else sg.WINDOW_CLOSED
-        values = result[1] if result else None
+    def mostra_empresas(self, empresas):
+        if isinstance(empresas, list):
+            if not empresas:
+                sg.popup("Nenhuma empresa encontrada.", title="📋 Lista de Empresas")
+                return None
 
-        if event == "Confirmar" and values and values.get("empresa"):
-            return values["empresa"][0].split(" - ")[1]  # retorna apenas o CNPJ
-        return None
+            headers = ["CNPJ", "Nome", "Telefone"]
+            rows = [[empresa.cnpj, empresa.nome_empresa, empresa.telefone] for empresa in empresas]
+
+            layout = [
+                [sg.Text("📋 Lista de Empresas", font=("Segoe UI", 14, "bold"))],
+                [sg.HorizontalSeparator()],
+
+                [sg.Table(values=rows, headings=headers, max_col_width=50,
+                        auto_size_columns=True, expand_x=True, expand_y=True,
+                        key="tabela_empresas", enable_events=True, select_mode='browse',
+                        justification="center")],
+
+                [sg.Button("Confirmar", size=(20, 1)),
+                sg.Button("Cancelar", size=(20, 1))]
+            ]
+
+            window = sg.Window(
+                "Lista de Empresas",
+                layout,
+                size=(650, 400),  # tabela mais larga
+                element_justification="center",
+                finalize=True
+            )
+
+            while True:
+                event, values = window.read()
+
+                if event in (sg.WINDOW_CLOSED, "Cancelar"):
+                    window.close()
+                    return None
+
+                if event == "Confirmar":
+                    selected = values.get("tabela_empresas")
+                    if selected:
+                        idx = selected[0]
+                        cnpj = rows[idx][0]
+                        window.close()
+                        return cnpj
+                    else:
+                        sg.popup("Selecione uma empresa antes de confirmar.")
+        else:
+            sg.popup_scrolled(
+                f"CNPJ: {empresas.cnpj}\nNome: {empresas.nome}",
+                title="📋 Empresa",
+                font=("Segoe UI", 11)
+            )
+
 
     def mostra_mensagem(self, msg):
-        sg.popup(msg, title="Mensagem", font=("Segoe UI", 11))
+        sg.popup(msg, title="Mensagem")
