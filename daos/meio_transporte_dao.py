@@ -7,17 +7,17 @@ class MeioTransporteDAO(DAO):
 
     def add(self, meio: MeioTransporte):
         if meio is not None:
-            super().add(meio.codigo, meio)
+            super().add(meio.tipo, meio)
 
-    def update(self, meio: MeioTransporte):
+    def update(self, meio):
         if meio is not None:
-            super().update(meio.codigo, meio)
+            super().update(meio.tipo, meio)
 
-    def get(self, codigo: str):
-        return super().get(codigo)
+    def get(self, tipo: str):
+        return super().get(tipo)
 
-    def remove(self, codigo: str):
-        super().remove(codigo)
+    def remove(self, tipo: str):
+        super().remove(tipo)
 
     def get_all(self):
         return list(super().get_all())
