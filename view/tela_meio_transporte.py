@@ -1,10 +1,8 @@
-# view/tela_meio_transporte.py
 import FreeSimpleGUI as sg
 
 class TelaMeioTransporte:
     def __init__(self):
         sg.theme("LightGray1")
-        # tipos fixos conforme solicitado (observação: 'Onibus' sem acento se preferir)
         self._tipos_fixos = ["Onibus", "Carro", "Avião"]
 
     def tela_opcoes(self):
@@ -24,42 +22,41 @@ class TelaMeioTransporte:
 
         if event is None:
             return 0
-        if event.startswith("1"):
-            return 1
-        if event.startswith("2"):
-            return 2
-        if event.startswith("3"):
-            return 3
-        if event.startswith("4"):
-            return 4
-        if event.startswith("0"):
-            return 0
-        # fallback
+        if event.startswith("1"): return 1
+        if event.startswith("2"): return 2
+        if event.startswith("3"): return 3
+        if event.startswith("4"): return 4
+        if event.startswith("0"): return 0
         return 0
 
     def mostra_mensagem(self, msg):
         sg.popup(msg)
 
     # -------------------------------------------------
-    # seleciona_meio_transporte: se receber 'meios' (iterável)
-    # exibe uma lista dos tipos já cadastrados para seleção (usar em alterar/excluir)
-    # se não receber 'meios', exibe combo com os TIPOS FIXOS (Onibus, Carro, Avião)
+    # Seleciona um meio da lista (para alterar ou excluir)
     # -------------------------------------------------
     def seleciona_meio_transporte(self, meios=None):
-        if meios:
-            # constroi lista de strings amigáveis a partir dos objetos meios
+        # Se receber a lista de meios, mostra o combo para escolher qual alterar/excluir
+        if meios is not None:
             opcoes = []
+            mapa_meios = {} # Para mapear a string de volta ao objeto
+
             for m in meios:
-                tipo = getattr(m, "tipo", None)
-                capacidade = getattr(m, "capacidade", "")
-                empresa = getattr(m, "empresa", "")
-                # tenta obter nome da empresa se possível
-                nome_empresa = getattr(empresa, "nome", str(empresa)) if empresa is not None else ""
-                opcoes.append(f"{tipo} — Capacidade: {capacidade} — Empresa: {nome_empresa}")
+                tipo = getattr(m, "tipo", "Sem Tipo")
+                capacidade = getattr(m, "capacidade", "?")
+                empresa = getattr(m, "empresa_transporte", None)
+                
+                # CORREÇÃO: Usar nome_empresa
+                nome_empresa = getattr(empresa, "nome_empresa", str(empresa)) if empresa else "Sem Empresa"
+                
+                # ID visual único para o usuário distinguir (usando memória ou contador se preferir, aqui string simples)
+                texto_opcao = f"{tipo} | Cap: {capacidade} | Emp: {nome_empresa}"
+                opcoes.append(texto_opcao)
+                mapa_meios[texto_opcao] = m
 
             layout = [
                 [sg.Text("Selecione o meio de transporte:", font=("Segoe UI", 12))],
-                [sg.Combo(opcoes, size=(60, 1), key="-MEIO-")],
+                [sg.Combo(opcoes, size=(60, 1), key="-MEIO-", readonly=True)],
                 [sg.Button("OK"), sg.Button("Cancelar")]
             ]
             window = sg.Window("Selecionar Meio", layout, element_justification="center")
@@ -68,48 +65,27 @@ class TelaMeioTransporte:
 
             if event != "OK":
                 return None
-
-            selecionado = values.get("-MEIO-")
-            if not selecionado:
-                return None
-
-            # extrai o tipo da string montada (antes do ' — ')
-            tipo = selecionado.split("—")[0].strip()
-            return tipo
+            
+            selecionado_str = values.get("-MEIO-")
+            return mapa_meios.get(selecionado_str) # Retorna o OBJETO real, não string
 
         else:
-            # mostra lista fixa de tipos (inclusão)
-            layout = [
-                [sg.Text("Selecione o tipo do meio de transporte:", font=("Segoe UI", 12))],
-                [sg.Combo(self._tipos_fixos, size=(40, 1), key="-TIPO-")],
-                [sg.Button("OK"), sg.Button("Cancelar")]
-            ]
-            window = sg.Window("Tipo do Meio", layout, element_justification="center")
-            event, values = window.read()
-            window.close()
-
-            if event != "OK":
-                return None
-
-            tipo = values.get("-TIPO-")
-            return tipo
+            return None
 
     # -------------------------------------------------
-    # pega_dados_meio_transporte: pede capacidade e (opcional) altera tipo
-    # se for passada uma instância 'meio', pré-preenche valores e permite
-    # alterar tipo e capacidade
+    # Pega dados (inclui seleção do tipo fixo)
     # -------------------------------------------------
     def pega_dados_meio_transporte(self, meio=None):
         tipo_inicial = getattr(meio, "tipo", "")
         capacidade_inicial = getattr(meio, "capacidade", "")
 
-        # para consistência visual, tipo também é um Combo com os fixos
         layout = [
-            [sg.Text("Tipo:", size=(12,1)), sg.Combo(self._tipos_fixos, default_value=tipo_inicial, size=(40,1), key="-TIPO-")],
+            [sg.Text("Dados do Meio de Transporte", font=("Segoe UI", 14, "bold"))],
+            [sg.Text("Tipo:", size=(12,1)), sg.Combo(self._tipos_fixos, default_value=tipo_inicial, size=(40,1), key="-TIPO-", readonly=True)],
             [sg.Text("Capacidade:", size=(12,1)), sg.Input(str(capacidade_inicial), size=(40,1), key="-CAP-")],
             [sg.Button("OK"), sg.Button("Cancelar")]
         ]
-        window = sg.Window("Dados do Meio de Transporte", layout, element_justification="left")
+        window = sg.Window("Cadastro Meio de Transporte", layout, element_justification="left")
         event, values = window.read()
         window.close()
 
@@ -118,27 +94,35 @@ class TelaMeioTransporte:
 
         tipo = values.get("-TIPO-")
         capacidade = values.get("-CAP-")
-        if tipo is None or capacidade is None:
+        
+        if not tipo or not capacidade:
             return None
 
         return {"tipo": tipo, "capacidade": capacidade}
 
     # -------------------------------------------------
-    # seleciona_empresa: recebe lista de objetos empresa e retorna a empresa selecionada
+    # Seleciona empresa (CORRIGIDO O ATRIBUTO NOME)
     # -------------------------------------------------
     def seleciona_empresa(self, empresas):
-        # tenta extrair nome, se houver atributo 'nome'
         opcoes = []
+        mapa_empresas = {}
+
         for e in empresas:
-            nome = getattr(e, "nome", None)
+            # CORREÇÃO: atributo correto é nome_empresa
+            nome = getattr(e, "nome_empresa", None)
+            cnpj = getattr(e, "cnpj", "")
+            
             if nome:
-                opcoes.append(nome)
+                texto = f"{nome} (CNPJ: {cnpj})"
             else:
-                opcoes.append(str(e))
+                texto = str(e)
+            
+            opcoes.append(texto)
+            mapa_empresas[texto] = e
 
         layout = [
             [sg.Text("Selecione a empresa responsável:", font=("Segoe UI", 12))],
-            [sg.Combo(opcoes, size=(60,1), key="-EMP-")],
+            [sg.Combo(opcoes, size=(60,1), key="-EMP-", readonly=True)],
             [sg.Button("OK"), sg.Button("Cancelar")]
         ]
         window = sg.Window("Selecionar Empresa", layout, element_justification="center")
@@ -149,26 +133,19 @@ class TelaMeioTransporte:
             return None
 
         selecionado = values.get("-EMP-")
-        if not selecionado:
-            return None
-
-        # retorna o objeto empresa correspondente
-        for e in empresas:
-            nome = getattr(e, "nome", None)
-            if nome == selecionado or str(e) == selecionado:
-                return e
-
-        return None
+        return mapa_empresas.get(selecionado)
 
     # -------------------------------------------------
+    # Listagem simples
+    # -------------------------------------------------
     def lista_meios(self, meios):
-        # constrói uma string grande para exibir a lista completa
         linhas = []
         for m in meios:
             tipo = getattr(m, "tipo", "")
             capacidade = getattr(m, "capacidade", "")
-            empresa = getattr(m, "empresa", "")
-            nome_empresa = getattr(empresa, "nome", str(empresa)) if empresa is not None else ""
+            empresa = getattr(m, "empresa_transporte", None)
+            nome_empresa = getattr(empresa, "nome_empresa", "N/A") if empresa else "N/A"
+            
             linhas.append(f"Tipo: {tipo} | Capacidade: {capacidade} | Empresa: {nome_empresa}")
 
         texto = "\n".join(linhas) if linhas else "Nenhum meio cadastrado."
