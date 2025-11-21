@@ -12,15 +12,16 @@ class ControladorItinerario:
     def itinerarios(self):
         return self.__itinerario_dao.get_all()
 
+    # Método auxiliar para outros controladores atualizarem itinerários (ex: adicionar passagem)
+    def atualizar_itinerario(self, itinerario):
+        self.__itinerario_dao.update(itinerario)
+
     def pega_itinerario_por_codigo(self, codigo):
-        # Aceita `codigo` como int ou str vindo da interface
         for itin in self.__itinerario_dao.get_all():
             try:
-                # comparar como inteiro quando possível
                 if int(itin.codigo_itinerario) == int(codigo):
                     return itin
             except Exception:
-                # fallback para comparação de string
                 if str(itin.codigo_itinerario) == str(codigo):
                     return itin
         return None
@@ -48,10 +49,18 @@ class ControladorItinerario:
             return
 
         self.__itinerario_dao.add(itinerario)
-        self.__tela_itinerario.mostra_mensagem("✅ Itinerário cadastrado com sucesso!")
+        
+        # --- MUDANÇA AQUI ---
+        # Pergunta se quer cadastrar passagem
+        if self.__tela_itinerario.confirmar_cadastro_passagem():
+            # Chama o controlador de passagem passando JÁ o itinerário criado
+            # Isso evita que o usuário tenha que digitar o código de novo
+            self.__controlador_controladores.controlador_passagem.incluir_passagem(itinerario_fixo=itinerario)
+        else:
+            # Se disser não, só avisa que o itinerário foi salvo
+            self.__tela_itinerario.mostra_mensagem("✅ Itinerário cadastrado com sucesso!")
 
     def alterar_itinerario(self):
-        # Mostrar todos os itinerários cadastrados para facilitar a escolha
         itinerarios = self.__itinerario_dao.get_all()
         if not itinerarios:
             self.__tela_itinerario.mostra_mensagem("Nenhum itinerário cadastrado.")
@@ -69,7 +78,6 @@ class ControladorItinerario:
 
         codigo = self.__tela_itinerario.mostra_itinerario(lista_itinerarios)
         if not codigo:
-            self.__tela_itinerario.mostra_mensagem("Operação cancelada.")
             return
 
         itinerario = self.pega_itinerario_por_codigo(codigo)
@@ -79,7 +87,6 @@ class ControladorItinerario:
 
         dados = self.__tela_itinerario.pega_dados_itinerario(itinerario)
         if not dados:
-            self.__tela_itinerario.mostra_mensagem("Operação cancelada.")
             return
 
         itinerario.origem = dados["origem"]
@@ -100,21 +107,22 @@ class ControladorItinerario:
             self.__tela_itinerario.mostra_mensagem("Nenhum itinerário cadastrado.")
             return
 
-        # Construir lista de dicionários e mostrar todos de uma vez
         lista_itinerarios = []
         for itin in itinerarios:
+            passagens_str = [f"Passagem {p.numero} ({p.pessoa.nome})" for p in itin.passagens]
+            
             lista_itinerarios.append({
                 "codigo_itinerario": itin.codigo_itinerario,
                 "origem": itin.origem,
                 "destino": itin.destino,
                 "data_inicio": itin.data_inicio,
-                "data_fim": itin.data_fim
+                "data_fim": itin.data_fim,
+                "passagens": passagens_str
             })
 
         self.__tela_itinerario.mostra_itinerario(lista_itinerarios)
 
     def excluir_itinerario(self):
-        # Mostrar todos os itinerários cadastrados para facilitar a escolha
         itinerarios = self.__itinerario_dao.get_all()
         if not itinerarios:
             self.__tela_itinerario.mostra_mensagem("Nenhum itinerário cadastrado.")
@@ -132,7 +140,6 @@ class ControladorItinerario:
 
         codigo = self.__tela_itinerario.mostra_itinerario(lista_itinerarios)
         if not codigo:
-            self.__tela_itinerario.mostra_mensagem("Operação cancelada.")
             return
 
         itinerario = self.pega_itinerario_por_codigo(codigo)
@@ -141,16 +148,6 @@ class ControladorItinerario:
             self.__tela_itinerario.mostra_mensagem("Itinerário removido com sucesso!")
         else:
             self.__tela_itinerario.mostra_mensagem("Itinerário não encontrado.")
-
-    def adicionar_passagem(self, codigo_itinerario, passagem):
-        itinerario = self.pega_itinerario_por_codigo(codigo_itinerario)
-        if not itinerario:
-            self.__tela_itinerario.mostra_mensagem("Itinerário não encontrado.")
-            return
-
-        itinerario.adicionar_passagem(passagem)
-        self.__itinerario_dao.update(itinerario)
-        self.__tela_itinerario.mostra_mensagem("✅ Passagem adicionada ao itinerário!")
 
     def retornar(self):
         self.__controlador_controladores.inicializa_sistema()

@@ -9,6 +9,20 @@ class ControladorMeioTransporte:
         self.__controlador_controladores = controlador_controladores
         self.__controlador_empresa_transporte = controlador_empresa_transporte
 
+    # --- ESTE É O MÉTODO QUE FALTAVA E CAUSAVA O ERRO ---
+    def pega_meio_por_tipo(self, tipo):
+        if not tipo:
+            return None
+        
+        # Normaliza a string para comparação (remove espaços e joga para minúsculo)
+        tipo_buscado = str(tipo).strip().lower()
+
+        for meio in self.__meio_transporte_dao.get_all():
+            # Compara o tipo salvo no banco com o digitado
+            if meio.tipo.lower() == tipo_buscado:
+                return meio
+        return None
+
     # -------------------------------------------------------------------------
     def incluir_meio_transporte(self):
         # Verifica se existem empresas antes de começar
@@ -19,8 +33,7 @@ class ControladorMeioTransporte:
             )
             return
 
-        # -------- FLUXO CORRIGIDO --------
-        # 1. Não pede o tipo separado. Pede os dados completos (Tipo e Capacidade)
+        # Pede os dados completos (Tipo e Capacidade)
         dados = self.__tela_meio_transporte.pega_dados_meio_transporte()
         if not dados:
             return # Cancelado
@@ -33,16 +46,15 @@ class ControladorMeioTransporte:
 
         tipo = dados["tipo"]
 
-        # 2. Selecionar empresa
+        # Selecionar empresa
         empresa = self.__tela_meio_transporte.seleciona_empresa(empresas)
         if not empresa:
             self.__tela_meio_transporte.mostra_mensagem("Nenhuma empresa selecionada. Cadastro cancelado.")
             return
 
-        # 3. Cria e Salva
+        # Cria e Salva
         meio = MeioTransporte(tipo, capacidade, empresa)
         
-        # O DAO agora usa UUID, então não vai sobrescrever carros existentes
         self.__meio_transporte_dao.add(meio)
 
         self.__tela_meio_transporte.mostra_mensagem(
@@ -61,15 +73,12 @@ class ControladorMeioTransporte:
             self.__tela_meio_transporte.mostra_mensagem("Nenhum meio cadastrado.")
             return
 
-        # A tela agora retorna o OBJETO selecionado, e não apenas uma string do tipo
         meio_selecionado = self.__tela_meio_transporte.seleciona_meio_transporte(meios)
         
         if not meio_selecionado:
             return
 
-        # Remove passando o objeto (o DAO se vira para achar a chave)
         self.__meio_transporte_dao.remove(meio_selecionado)
-
         self.__tela_meio_transporte.mostra_mensagem("Meio de transporte excluído com sucesso!")
 
     # -------------------------------------------------------------------------
@@ -79,12 +88,10 @@ class ControladorMeioTransporte:
             self.__tela_meio_transporte.mostra_mensagem("Nenhum meio cadastrado.")
             return
 
-        # Seleciona o objeto
         meio_selecionado = self.__tela_meio_transporte.seleciona_meio_transporte(meios)
         if not meio_selecionado:
             return
 
-        # Pega novos dados
         novos_dados = self.__tela_meio_transporte.pega_dados_meio_transporte(meio_selecionado)
         if not novos_dados:
             return
@@ -95,11 +102,9 @@ class ControladorMeioTransporte:
             self.__tela_meio_transporte.mostra_mensagem("Capacidade inválida.")
             return
 
-        # Atualiza o objeto na memória
         meio_selecionado.tipo = novos_dados["tipo"]
         meio_selecionado.capacidade = nova_capacidade
         
-        # Persiste a alteração no DAO
         self.__meio_transporte_dao.update(meio_selecionado)
         
         self.__tela_meio_transporte.mostra_mensagem("Meio atualizado com sucesso!")

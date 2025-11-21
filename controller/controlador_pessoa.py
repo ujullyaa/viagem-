@@ -138,6 +138,22 @@ class ControladorPessoa:
         else:
             self.__tela_pessoa.mostra_mensagem("Pessoa não encontrada.")
 
+    # Adicione este método dentro da classe ControladorPessoa (no final da classe)
+
+    # --- Método auxiliar para ser chamado pelo ControladorPassagem ---
+    def escolher_pessoa_externo(self):
+        # 1. Monta a lista de dados para a tabela
+        dados_pessoas = self.__monta_lista_dados()
+        
+        # 2. Abre a tela de seleção visual (Tabela)
+        cpf = self.__tela_pessoa.seleciona_pessoa_por_lista(dados_pessoas)
+        
+        if not cpf:
+            return None
+            
+        # 3. Retorna o OBJETO Pessoa
+        return self.pega_pessoa_por_cpf(cpf)
+
     def retornar(self):
         self.__controlador_controladores.inicializa_sistema()
 

@@ -81,7 +81,7 @@ class TelaPessoa:
             [sg.Text("📋 Lista de Pessoas", font=("Segoe UI", 14, "bold"))],
             [sg.HorizontalSeparator()],
             [sg.Table(values=rows, headings=headers, max_col_width=50, auto_size_columns=True, 
-                      expand_x=True, expand_y=True, justification='center', key="tabela_pessoas")],
+                    expand_x=True, expand_y=True, justification='center', key="tabela_pessoas")],
             [sg.HorizontalSeparator()],
             [sg.Button("Voltar", size=(20, 1))]
         ]
@@ -104,8 +104,8 @@ class TelaPessoa:
             [sg.Text("Selecione a Pessoa na lista:", font=("Segoe UI", 14, "bold"))],
             [sg.HorizontalSeparator()],
             [sg.Table(values=rows, headings=headers, max_col_width=50, auto_size_columns=True,
-                      expand_x=True, expand_y=True, justification='center',
-                      key="tabela_pessoas", enable_events=True, select_mode='browse')],
+                    expand_x=True, expand_y=True, justification='center',
+                    key="tabela_pessoas", enable_events=True, select_mode='browse')],
             [sg.HorizontalSeparator()],
             [sg.Button("Confirmar", size=(20, 1)), sg.Button("Cancelar", size=(20, 1))]
         ]

@@ -2,7 +2,6 @@ import FreeSimpleGUI as sg
 
 class TelaMeioTransporte:
     def __init__(self):
-        sg.theme("LightGray1")
         self._tipos_fixos = ["Onibus", "Carro", "Avião"]
 
     def tela_opcoes(self):

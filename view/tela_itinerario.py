@@ -8,31 +8,27 @@ class TelaItinerario:
                 [
                     [sg.Text("🗺️  Menu Itinerário", font=("Segoe UI", 18, "bold"))],
                     [sg.HorizontalSeparator()],
-                    [sg.Button("1 - Incluir Itinerário")],
-                    [sg.Button("2 - Alterar Itinerário")],
-                    [sg.Button("3 - Listar Itinerários")],
-                    [sg.Button("4 - Excluir Itinerário")],
-                    [sg.Button("0 - Voltar ao Menu Principal", button_color=("white", "red"))]
+                    [sg.Button("1 - Incluir Itinerário", size=(35, 1))],
+                    [sg.Button("2 - Alterar Itinerário", size=(35, 1))],
+                    [sg.Button("3 - Listar Itinerários", size=(35, 1))],
+                    [sg.Button("4 - Excluir Itinerário", size=(35, 1))],
+                    [sg.HorizontalSeparator()],
+                    [sg.Button("0 - Voltar ao Menu Principal", button_color=("white", "red"), size=(35, 1))]
                 ],
                 element_justification="center"
             )]
         ]
-        window = sg.Window("Menu Itinerário", layout)
+        window = sg.Window("Menu Itinerário", layout, element_justification="center")
         result = window.read()
         window.close()
+        
         event = result[0] if result else sg.WINDOW_CLOSED
-        _ = result[1] if result else None
-
-        if event in (sg.WINDOW_CLOSED, "0 - Voltar ao Menu Principal"):
-            return 0
-        elif event == "1 - Incluir Itinerário":
-            return 1
-        elif event == "2 - Alterar Itinerário":
-            return 2
-        elif event == "3 - Listar Itinerários":
-            return 3
-        elif event == "4 - Excluir Itinerário":
-            return 4
+        
+        if event in (sg.WINDOW_CLOSED, "0 - Voltar ao Menu Principal"): return 0
+        if event == "1 - Incluir Itinerário": return 1
+        if event == "2 - Alterar Itinerário": return 2
+        if event == "3 - Listar Itinerários": return 3
+        if event == "4 - Excluir Itinerário": return 4
         return -1
 
     def pega_dados_itinerario(self, itinerario=None):
@@ -45,15 +41,15 @@ class TelaItinerario:
         layout = [
             [sg.Text("🗺️ Cadastro de Itinerário", font=("Segoe UI", 18, "bold"))],
             [sg.HorizontalSeparator()],
-            [sg.Text("Código do Itinerário:", size=(18,1)), sg.Input(default_text=codigo_default, key="codigo_itinerario", disabled=itinerario is not None)],
-            [sg.Text("Origem:", size=(18,1)), sg.Input(default_text=origem_default, key="origem")],
-            [sg.Text("Destino:", size=(18,1)), sg.Input(default_text=destino_default, key="destino")],
-            [sg.Text("Data de Início (DD/MM/AAAA):", size=(18,1)), sg.Input(default_text=data_inicio_default, key="data_inicio")],
-            [sg.Text("Data de Fim (DD/MM/AAAA):", size=(18,1)), sg.Input(default_text=data_fim_default, key="data_fim")],
+            [sg.Text("Código do Itinerário:", size=(20,1)), sg.Input(default_text=codigo_default, key="codigo_itinerario", disabled=itinerario is not None, size=(45, 1))],
+            [sg.Text("Origem:", size=(20,1)), sg.Input(default_text=origem_default, key="origem", size=(45, 1))],
+            [sg.Text("Destino:", size=(20,1)), sg.Input(default_text=destino_default, key="destino", size=(45, 1))],
+            [sg.Text("Data Início (DD/MM/AAAA):", size=(20,1)), sg.Input(default_text=data_inicio_default, key="data_inicio", size=(45, 1))],
+            [sg.Text("Data Fim (DD/MM/AAAA):", size=(20,1)), sg.Input(default_text=data_fim_default, key="data_fim", size=(45, 1))],
             [sg.HorizontalSeparator()],
-            [sg.Button("💾 Confirmar", key="confirmar"), sg.Button("↩️ Cancelar", key="cancelar")]
+            [sg.Button("💾 Confirmar", key="confirmar", size=(20, 1)), sg.Button("↩️ Cancelar", key="cancelar", size=(20, 1))]
         ]
-        window = sg.Window("Cadastro/Alteração de Itinerário", layout)
+        window = sg.Window("Cadastro/Alteração de Itinerário", layout, element_justification="center")
         result = window.read()
         window.close()
         
@@ -74,13 +70,11 @@ class TelaItinerario:
         return None
 
     def mostra_itinerario(self, dados_itinerario):
-        # Se for uma lista de itinerários
         if isinstance(dados_itinerario, list):
             if not dados_itinerario:
                 sg.popup("Nenhum itinerário encontrado.", title="📋 Lista de Itinerários")
                 return
             
-            # Criar tabela com itinerários
             headers = ["Código", "Origem", "Destino", "Data Início", "Data Fim"]
             rows = []
             for itinerario in dados_itinerario:
@@ -95,10 +89,12 @@ class TelaItinerario:
             layout = [
                 [sg.Text("📋 Lista de Itinerários", font=("Segoe UI", 14, "bold"))],
                 [sg.HorizontalSeparator()],
-                [sg.Table(values=rows, headings=headers, max_col_width=20, auto_size_columns=True, key="tabela_itinerarios", enable_events=True, select_mode='browse')],
-                [sg.Button("Confirmar", key="confirmar"), sg.Button("Cancelar", key="cancelar")]
+                [sg.Table(values=rows, headings=headers, max_col_width=50, auto_size_columns=True, 
+                          expand_x=True, expand_y=True, justification='center',
+                          key="tabela_itinerarios", enable_events=True, select_mode='browse')],
+                [sg.Button("Confirmar", key="confirmar", size=(20, 1)), sg.Button("Cancelar", key="cancelar", size=(20, 1))]
             ]
-            window = sg.Window("Lista de Itinerários", layout)
+            window = sg.Window("Lista de Itinerários", layout, size=(800, 400), element_justification="center")
             while True:
                 result = window.read()
                 event = result[0] if result else sg.WINDOW_CLOSED
@@ -117,10 +113,8 @@ class TelaItinerario:
                         return codigo
                     else:
                         sg.popup("Selecione um itinerário antes de confirmar.", title="Aviso")
-                        continue
             window.close()
         else:
-            # Se for um único itinerário
             texto = (
                 f"🗺️ Código: {dados_itinerario.get('codigo_itinerario','')}\n"
                 f"🏠 Origem: {dados_itinerario.get('origem','')}\n"
@@ -144,12 +138,17 @@ class TelaItinerario:
         event = result[0] if result else sg.WINDOW_CLOSED
         values = result[1] if result else None
 
-        if values is None or event in (sg.WINDOW_CLOSED, "cancelar"):
-            return None
-            
         if event == "confirmar":
             return values.get("codigo_itinerario", "").strip()
         return None
 
     def mostra_mensagem(self, msg):
         sg.popup(msg, title="Mensagem")
+
+    # --- NOVO MÉTODO ---
+    def confirmar_cadastro_passagem(self):
+        # Popup simples do PySimpleGUI que retorna "Yes" ou "No"
+        resposta = sg.popup_yes_no("Itinerário cadastrado!\nDeseja cadastrar uma passagem para este itinerário agora?", 
+                                title="Cadastrar Passagem?", 
+                                font=("Segoe UI", 11))
+        return resposta == "Yes"
