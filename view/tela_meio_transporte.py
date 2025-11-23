@@ -2,150 +2,136 @@ import FreeSimpleGUI as sg
 
 class TelaMeioTransporte:
     def __init__(self):
+        sg.theme("DarkBlue3")
         self._tipos_fixos = ["Onibus", "Carro", "Avião"]
 
     def tela_opcoes(self):
         layout = [
-            [sg.Text("🚍 Menu Meio de Transporte", font=("Segoe UI", 18, "bold"))],
-            [sg.HorizontalSeparator()],
-            [sg.Button("1 - Incluir Meio de Transporte", size=(30,1))],
-            [sg.Button("2 - Alterar Meio de Transporte", size=(30,1))],
-            [sg.Button("3 - Listar Meios de Transporte", size=(30,1))],
-            [sg.Button("4 - Excluir Meio de Transporte", size=(30,1))],
-            [sg.HorizontalSeparator()],
-            [sg.Button("0 - Retornar", size=(30,1))],
+            [sg.Column(
+                [
+                    [sg.Text("🚍 Menu Meio de Transporte", font=("Segoe UI", 18, "bold"))],
+                    [sg.HorizontalSeparator()],
+                    [sg.Button("1 - Incluir Meio de Transporte", size=(35, 1))],
+                    [sg.Button("2 - Alterar Meio de Transporte", size=(35, 1))],
+                    [sg.Button("3 - Listar Meios de Transporte", size=(35, 1))],
+                    [sg.Button("4 - Excluir Meio de Transporte", size=(35, 1))],
+                    [sg.HorizontalSeparator()],
+                    [sg.Button("0 - Voltar ao Menu Principal", button_color=("white", "red"), size=(35, 1))]
+                ],
+                element_justification="center",
+                expand_x=True
+            )]
         ]
         window = sg.Window("Meios de Transporte", layout, element_justification="center")
-        event, values = window.read()
+        event, _ = window.read()
         window.close()
 
-        if event is None:
-            return 0
-        if event.startswith("1"): return 1
-        if event.startswith("2"): return 2
-        if event.startswith("3"): return 3
-        if event.startswith("4"): return 4
-        if event.startswith("0"): return 0
+        if event in (sg.WINDOW_CLOSED, "0 - Voltar ao Menu Principal"): return 0
+        if event == "1 - Incluir Meio de Transporte": return 1
+        if event == "2 - Alterar Meio de Transporte": return 2
+        if event == "3 - Listar Meios de Transporte": return 3
+        if event == "4 - Excluir Meio de Transporte": return 4
         return 0
 
-    def mostra_mensagem(self, msg):
-        sg.popup(msg)
-
-    # -------------------------------------------------
-    # Seleciona um meio da lista (para alterar ou excluir)
-    # -------------------------------------------------
-    def seleciona_meio_transporte(self, meios=None):
-        # Se receber a lista de meios, mostra o combo para escolher qual alterar/excluir
-        if meios is not None:
-            opcoes = []
-            mapa_meios = {} # Para mapear a string de volta ao objeto
-
-            for m in meios:
-                tipo = getattr(m, "tipo", "Sem Tipo")
-                capacidade = getattr(m, "capacidade", "?")
-                empresa = getattr(m, "empresa_transporte", None)
-                
-                # CORREÇÃO: Usar nome_empresa
-                nome_empresa = getattr(empresa, "nome_empresa", str(empresa)) if empresa else "Sem Empresa"
-                
-                # ID visual único para o usuário distinguir (usando memória ou contador se preferir, aqui string simples)
-                texto_opcao = f"{tipo} | Cap: {capacidade} | Emp: {nome_empresa}"
-                opcoes.append(texto_opcao)
-                mapa_meios[texto_opcao] = m
-
-            layout = [
-                [sg.Text("Selecione o meio de transporte:", font=("Segoe UI", 12))],
-                [sg.Combo(opcoes, size=(60, 1), key="-MEIO-", readonly=True)],
-                [sg.Button("OK"), sg.Button("Cancelar")]
-            ]
-            window = sg.Window("Selecionar Meio", layout, element_justification="center")
-            event, values = window.read()
-            window.close()
-
-            if event != "OK":
-                return None
-            
-            selecionado_str = values.get("-MEIO-")
-            return mapa_meios.get(selecionado_str) # Retorna o OBJETO real, não string
-
-        else:
-            return None
-
-    # -------------------------------------------------
-    # Pega dados (inclui seleção do tipo fixo)
-    # -------------------------------------------------
     def pega_dados_meio_transporte(self, meio=None):
-        tipo_inicial = getattr(meio, "tipo", "")
-        capacidade_inicial = getattr(meio, "capacidade", "")
+        tipo = meio.tipo if meio else ""
+        cap = meio.capacidade if meio else ""
 
         layout = [
-            [sg.Text("Dados do Meio de Transporte", font=("Segoe UI", 14, "bold"))],
-            [sg.Text("Tipo:", size=(12,1)), sg.Combo(self._tipos_fixos, default_value=tipo_inicial, size=(40,1), key="-TIPO-", readonly=True)],
-            [sg.Text("Capacidade:", size=(12,1)), sg.Input(str(capacidade_inicial), size=(40,1), key="-CAP-")],
-            [sg.Button("OK"), sg.Button("Cancelar")]
+            [sg.Text("🚍 Dados do Veículo", font=("Segoe UI", 14, "bold"))],
+            [sg.Text("Tipo:", size=(15,1)), sg.Combo(self._tipos_fixos, default_value=tipo, size=(43,1), key="-TIPO-", readonly=True)],
+            [sg.Text("Capacidade:", size=(15,1)), sg.Input(str(cap), size=(45,1), key="-CAP-")],
+            [sg.HorizontalSeparator()],
+            [sg.Button("💾 Confirmar", size=(20,1)), sg.Button("↩️ Cancelar", size=(20,1))]
         ]
-        window = sg.Window("Cadastro Meio de Transporte", layout, element_justification="left")
+        window = sg.Window("Cadastro Veículo", layout, element_justification="center")
         event, values = window.read()
         window.close()
 
-        if event != "OK":
-            return None
+        if event == "💾 Confirmar":
+            return {"tipo": values["-TIPO-"], "capacidade": values["-CAP-"]}
+        return None
 
-        tipo = values.get("-TIPO-")
-        capacidade = values.get("-CAP-")
+    def seleciona_meio_transporte(self, meios):
+        # Se a lista estiver vazia, o controlador avisa.
+        # Aqui vamos usar TABELA para selecionar (muito melhor que combo)
+        headers = ["Tipo", "Capacidade", "Empresa"]
+        rows = []
+        # Mapeamento para retornar o OBJETO correto, pois não temos ID simples aqui
+        mapa_objetos = {} 
         
-        if not tipo or not capacidade:
-            return None
-
-        return {"tipo": tipo, "capacidade": capacidade}
-
-    # -------------------------------------------------
-    # Seleciona empresa (CORRIGIDO O ATRIBUTO NOME)
-    # -------------------------------------------------
-    def seleciona_empresa(self, empresas):
-        opcoes = []
-        mapa_empresas = {}
-
-        for e in empresas:
-            # CORREÇÃO: atributo correto é nome_empresa
-            nome = getattr(e, "nome_empresa", None)
-            cnpj = getattr(e, "cnpj", "")
-            
-            if nome:
-                texto = f"{nome} (CNPJ: {cnpj})"
-            else:
-                texto = str(e)
-            
-            opcoes.append(texto)
-            mapa_empresas[texto] = e
+        for idx, m in enumerate(meios):
+            emp_nome = m.empresa_transporte.nome_empresa if m.empresa_transporte else "N/A"
+            rows.append([m.tipo, m.capacidade, emp_nome])
+            mapa_objetos[idx] = m
 
         layout = [
-            [sg.Text("Selecione a empresa responsável:", font=("Segoe UI", 12))],
-            [sg.Combo(opcoes, size=(60,1), key="-EMP-", readonly=True)],
-            [sg.Button("OK"), sg.Button("Cancelar")]
+            [sg.Text("Selecione o Veículo:", font=("Segoe UI", 14, "bold"))],
+            [sg.Table(values=rows, headings=headers, max_col_width=50, auto_size_columns=True,
+                    justification='center', key="tabela", enable_events=True, select_mode='browse', 
+                    expand_x=True, expand_y=True)],
+            [sg.Button("Confirmar", size=(20,1)), sg.Button("Cancelar", size=(20,1))]
         ]
-        window = sg.Window("Selecionar Empresa", layout, element_justification="center")
-        event, values = window.read()
+
+        window = sg.Window("Seleção", layout, size=(800, 400), element_justification="center")
+        
+        meio_selecionado = None
+        while True:
+            event, values = window.read()
+            if event in (sg.WINDOW_CLOSED, "Cancelar"): break
+            if event == "Confirmar":
+                if values["tabela"]:
+                    idx_tabela = values["tabela"][0]
+                    meio_selecionado = mapa_objetos[idx_tabela]
+                    break
+                else:
+                    sg.popup("Selecione uma linha!")
+        
+        window.close()
+        return meio_selecionado
+
+    def lista_meios(self, meios):
+        # Reutiliza a lógica de tabela, mas sem retornar seleção
+        if not meios:
+            sg.popup("Nenhum meio cadastrado.")
+            return
+        
+        headers = ["Tipo", "Capacidade", "Empresa"]
+        rows = [[m.tipo, m.capacidade, (m.empresa_transporte.nome_empresa if m.empresa_transporte else "N/A")] for m in meios]
+
+        layout = [
+            [sg.Text("📋 Frota Cadastrada", font=("Segoe UI", 14, "bold"))],
+            [sg.Table(values=rows, headings=headers, max_col_width=50, auto_size_columns=True,
+                    justification='center', expand_x=True, expand_y=True)],
+            [sg.Button("Voltar", size=(20,1))]
+        ]
+        window = sg.Window("Lista", layout, size=(800, 400), element_justification="center")
+        window.read()
         window.close()
 
-        if event != "OK":
-            return None
+    def seleciona_empresa(self, empresas):
+        # Transforma em Tabela também para padronizar
+        headers = ["Nome", "CNPJ"]
+        rows = [[e.nome_empresa, e.cnpj] for e in empresas]
+        mapa = {idx: e for idx, e in enumerate(empresas)}
 
-        selecionado = values.get("-EMP-")
-        return mapa_empresas.get(selecionado)
+        layout = [
+            [sg.Text("Selecione a Empresa Proprietária:", font=("Segoe UI", 14))],
+            [sg.Table(values=rows, headings=headers, auto_size_columns=True, key="tab", select_mode='browse', expand_x=True, expand_y=True)],
+            [sg.Button("Confirmar"), sg.Button("Cancelar")]
+        ]
+        window = sg.Window("Seleção Empresa", layout, size=(600, 300))
+        empresa_obj = None
+        
+        while True:
+            ev, val = window.read()
+            if ev in (sg.WINDOW_CLOSED, "Cancelar"): break
+            if ev == "Confirmar":
+                if val["tab"]:
+                    empresa_obj = mapa[val["tab"][0]]
+                    break
+        window.close()
+        return empresa_obj
 
-    # -------------------------------------------------
-    # Listagem simples
-    # -------------------------------------------------
-    def lista_meios(self, meios):
-        linhas = []
-        for m in meios:
-            tipo = getattr(m, "tipo", "")
-            capacidade = getattr(m, "capacidade", "")
-            empresa = getattr(m, "empresa_transporte", None)
-            nome_empresa = getattr(empresa, "nome_empresa", "N/A") if empresa else "N/A"
-            
-            linhas.append(f"Tipo: {tipo} | Capacidade: {capacidade} | Empresa: {nome_empresa}")
-
-        texto = "\n".join(linhas) if linhas else "Nenhum meio cadastrado."
-        sg.popup_scrolled(texto, title="Meios de Transporte", size=(80,20))
+    def mostra_mensagem(self, msg):
+        sg.popup(msg, title="Aviso", font=("Segoe UI", 11))

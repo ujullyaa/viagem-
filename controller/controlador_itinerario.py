@@ -1,6 +1,8 @@
 from view.tela_itinerario import TelaItinerario
 from model.itinerario import Itinerario
 from daos.itinerario_dao import ItinerarioDAO
+from exceptions.elemento_nao_existe_exception import ElementoNaoExisteException
+from exceptions.elemento_repetido_exception import ElementoRepetidoException
 
 class ControladorItinerario:
     def __init__(self, controlador_controladores):
@@ -12,161 +14,156 @@ class ControladorItinerario:
     def itinerarios(self):
         return self.__itinerario_dao.get_all()
 
-    # Método auxiliar para outros controladores atualizarem itinerários (ex: adicionar passagem)
     def atualizar_itinerario(self, itinerario):
         self.__itinerario_dao.update(itinerario)
 
     def pega_itinerario_por_codigo(self, codigo):
         for itin in self.__itinerario_dao.get_all():
-            try:
-                if int(itin.codigo_itinerario) == int(codigo):
-                    return itin
-            except Exception:
-                if str(itin.codigo_itinerario) == str(codigo):
-                    return itin
+            if str(itin.codigo_itinerario) == str(codigo):
+                return itin
         return None
 
     def incluir_itinerario(self):
         dados = self.__tela_itinerario.pega_dados_itinerario()
-        if not dados:
-            self.__tela_itinerario.mostra_mensagem("Operação cancelada.")
-            return
+        if not dados: return
 
-        if self.pega_itinerario_por_codigo(dados["codigo_itinerario"]):
-            self.__tela_itinerario.mostra_mensagem("Itinerário já cadastrado!")
-            return
+        try:
+            if self.pega_itinerario_por_codigo(dados["codigo_itinerario"]):
+                raise ElementoRepetidoException(f"Itinerário com código {dados['codigo_itinerario']} já existe.")
 
-        itinerario = Itinerario(
-            codigo_itinerario=dados["codigo_itinerario"],
-            origem=dados["origem"],
-            destino=dados["destino"],
-            data_inicio=dados["data_inicio"],
-            data_fim=dados["data_fim"]
-        )
+            itinerario = Itinerario(
+                codigo_itinerario=dados["codigo_itinerario"],
+                origem=dados["origem"],
+                destino=dados["destino"],
+                data_inicio=dados["data_inicio"],
+                data_fim=dados["data_fim"]
+            )
 
-        if not itinerario.validar_datas():
-            self.__tela_itinerario.mostra_mensagem("Datas inválidas!")
-            return
+            if not itinerario.validar_datas():
+                self.__tela_itinerario.mostra_mensagem("Datas inválidas!")
+                return
 
-        self.__itinerario_dao.add(itinerario)
-        
-        # --- MUDANÇA AQUI ---
-        # Pergunta se quer cadastrar passagem
-        if self.__tela_itinerario.confirmar_cadastro_passagem():
-            # Chama o controlador de passagem passando JÁ o itinerário criado
-            # Isso evita que o usuário tenha que digitar o código de novo
-            self.__controlador_controladores.controlador_passagem.incluir_passagem(itinerario_fixo=itinerario)
-        else:
-            # Se disser não, só avisa que o itinerário foi salvo
-            self.__tela_itinerario.mostra_mensagem("✅ Itinerário cadastrado com sucesso!")
+            self.__itinerario_dao.add(itinerario)
+            
+            if self.__tela_itinerario.confirmar_cadastro_passagem():
+                self.__controlador_controladores.controlador_passagem.incluir_passagem(itinerario_fixo=itinerario)
+            else:
+                self.__tela_itinerario.mostra_mensagem("Itinerário cadastrado!")
+
+        except ElementoRepetidoException as e:
+            self.__tela_itinerario.mostra_mensagem(str(e))
 
     def alterar_itinerario(self):
-        itinerarios = self.__itinerario_dao.get_all()
-        if not itinerarios:
-            self.__tela_itinerario.mostra_mensagem("Nenhum itinerário cadastrado.")
-            return
+        try:
+            itinerarios = self.__itinerario_dao.get_all()
+            if not itinerarios: 
+                self.__tela_itinerario.mostra_mensagem("Nenhum cadastrado.")
+                return
 
-        lista_itinerarios = []
-        for itin in itinerarios:
-            lista_itinerarios.append({
-                "codigo_itinerario": itin.codigo_itinerario,
-                "origem": itin.origem,
-                "destino": itin.destino,
-                "data_inicio": itin.data_inicio,
-                "data_fim": itin.data_fim
-            })
+            lista_itinerarios = []
+            for i in itinerarios:
+                lista_itinerarios.append({
+                    "codigo_itinerario": i.codigo_itinerario,
+                    "origem": i.origem,
+                    "destino": i.destino,
+                    "data_inicio": i.data_inicio,
+                    "data_fim": i.data_fim
+                })
 
-        codigo = self.__tela_itinerario.mostra_itinerario(lista_itinerarios)
-        if not codigo:
-            return
+            # CORREÇÃO: Chama o seleciona (com botão Confirmar/Cancelar)
+            codigo = self.__tela_itinerario.seleciona_itinerario(lista_itinerarios)
+            if not codigo: return
 
-        itinerario = self.pega_itinerario_por_codigo(codigo)
-        if not itinerario:
-            self.__tela_itinerario.mostra_mensagem("Itinerário não encontrado.")
-            return
-
-        dados = self.__tela_itinerario.pega_dados_itinerario(itinerario)
-        if not dados:
-            return
-
-        itinerario.origem = dados["origem"]
-        itinerario.destino = dados["destino"]
-        itinerario.data_inicio = dados["data_inicio"]
-        itinerario.data_fim = dados["data_fim"]
-
-        if not itinerario.validar_datas():
-            self.__tela_itinerario.mostra_mensagem("Datas inválidas!")
-            return
-
-        self.__itinerario_dao.update(itinerario)
-        self.__tela_itinerario.mostra_mensagem("✅ Itinerário alterado com sucesso!")
-
-    def listar_itinerarios(self):
-        itinerarios = self.__itinerario_dao.get_all()
-        if not itinerarios:
-            self.__tela_itinerario.mostra_mensagem("Nenhum itinerário cadastrado.")
-            return
-
-        lista_itinerarios = []
-        for itin in itinerarios:
-            passagens_str = [f"Passagem {p.numero} ({p.pessoa.nome})" for p in itin.passagens]
+            itinerario = self.pega_itinerario_por_codigo(codigo)
             
-            lista_itinerarios.append({
-                "codigo_itinerario": itin.codigo_itinerario,
-                "origem": itin.origem,
-                "destino": itin.destino,
-                "data_inicio": itin.data_inicio,
-                "data_fim": itin.data_fim,
-                "passagens": passagens_str
-            })
+            if not itinerario:
+                raise ElementoNaoExisteException("Itinerário não encontrado para alteração.")
 
-        self.__tela_itinerario.mostra_itinerario(lista_itinerarios)
+            dados = self.__tela_itinerario.pega_dados_itinerario(itinerario)
+            if not dados: return
+
+            itinerario.origem = dados["origem"]
+            itinerario.destino = dados["destino"]
+            itinerario.data_inicio = dados["data_inicio"]
+            itinerario.data_fim = dados["data_fim"]
+
+            if not itinerario.validar_datas():
+                self.__tela_itinerario.mostra_mensagem("Datas inválidas!")
+                return
+
+            self.__itinerario_dao.update(itinerario)
+            self.__tela_itinerario.mostra_mensagem("Atualizado com sucesso!")
+
+        except ElementoNaoExisteException as e:
+            self.__tela_itinerario.mostra_mensagem(str(e))
 
     def excluir_itinerario(self):
-        itinerarios = self.__itinerario_dao.get_all()
-        if not itinerarios:
+        try:
+            itinerarios = self.__itinerario_dao.get_all()
+            if not itinerarios: 
+                self.__tela_itinerario.mostra_mensagem("Vazio.")
+                return
+
+            lista_itinerarios = []
+            for i in itinerarios:
+                lista_itinerarios.append({
+                    "codigo_itinerario": i.codigo_itinerario,
+                    "origem": i.origem,
+                    "destino": i.destino,
+                    "data_inicio": i.data_inicio,
+                    "data_fim": i.data_fim
+                })
+            
+            # CORREÇÃO: Chama o seleciona (com botão Confirmar/Cancelar)
+            codigo = self.__tela_itinerario.seleciona_itinerario(lista_itinerarios)
+            if not codigo: return
+
+            itinerario = self.pega_itinerario_por_codigo(codigo)
+            
+            if not itinerario:
+                raise ElementoNaoExisteException("Itinerário não existe.")
+
+            self.__itinerario_dao.remove(itinerario.codigo_itinerario)
+            self.__tela_itinerario.mostra_mensagem("Removido!")
+
+        except ElementoNaoExisteException as e:
+            self.__tela_itinerario.mostra_mensagem(str(e))
+
+    def listar_itinerarios(self):
+        itins = self.__itinerario_dao.get_all()
+        if not itins:
             self.__tela_itinerario.mostra_mensagem("Nenhum itinerário cadastrado.")
             return
 
-        lista_itinerarios = []
-        for itin in itinerarios:
-            lista_itinerarios.append({
-                "codigo_itinerario": itin.codigo_itinerario,
-                "origem": itin.origem,
-                "destino": itin.destino,
-                "data_inicio": itin.data_inicio,
-                "data_fim": itin.data_fim
+        lista = []
+        for i in itins:
+            lista.append({
+                "codigo_itinerario": i.codigo_itinerario,
+                "origem": i.origem,
+                "destino": i.destino,
+                "data_inicio": i.data_inicio,
+                "data_fim": i.data_fim
             })
-
-        codigo = self.__tela_itinerario.mostra_itinerario(lista_itinerarios)
-        if not codigo:
-            return
-
-        itinerario = self.pega_itinerario_por_codigo(codigo)
-        if itinerario:
-            self.__itinerario_dao.remove(itinerario.codigo_itinerario)
-            self.__tela_itinerario.mostra_mensagem("Itinerário removido com sucesso!")
-        else:
-            self.__tela_itinerario.mostra_mensagem("Itinerário não encontrado.")
-
+        # CORREÇÃO: Chama mostra_itinerarios (apenas lista e botão Voltar)
+        self.__tela_itinerario.mostra_itinerarios(lista)
+    
     def retornar(self):
-        self.__controlador_controladores.inicializa_sistema()
+        return
 
     def abre_tela(self):
         opcoes = {
-            1: self.incluir_itinerario,
-            2: self.alterar_itinerario,
-            3: self.listar_itinerarios,
-            4: self.excluir_itinerario,
+            1: self.incluir_itinerario, 
+            2: self.alterar_itinerario, 
+            3: self.listar_itinerarios, 
+            4: self.excluir_itinerario, 
             0: self.retornar
         }
-
         while True:
-            escolha = self.__tela_itinerario.tela_opcoes()
-            funcao = opcoes.get(escolha)
+            opcao = self.__tela_itinerario.tela_opcoes()
+            if opcao == 0:
+                break
+            funcao = opcoes.get(opcao)
             if funcao:
                 funcao()
-                if escolha == 0:
-                    break
             else:
                 self.__tela_itinerario.mostra_mensagem("Opção inválida.")

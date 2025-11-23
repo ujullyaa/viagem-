@@ -4,6 +4,8 @@ from controller.controlador_meio_transporte import ControladorMeioTransporte
 from controller.controlador_itinerario import ControladorItinerario
 from controller.controlador_passagem import ControladorPassagem
 from controller.controlador_pagamento import ControladorPagamento
+# --- NOVO IMPORT ---
+from controller.controlador_viagem import ControladorViagem 
 from view.tela_controladores import TelaControladores
 import FreeSimpleGUI as sg
 
@@ -30,6 +32,9 @@ class ControladorControladores:
         )
 
         self.__controlador_pagamento = ControladorPagamento(self)
+
+        # --- INSTANCIANDO A VIAGEM ---
+        self.__controlador_viagem = ControladorViagem(self)
 
         # Tela principal
         self.__tela_principal = TelaControladores()
@@ -62,6 +67,11 @@ class ControladorControladores:
     def controlador_pagamento(self):
         return self.__controlador_pagamento
 
+    # --- GETTER DA VIAGEM ---
+    @property
+    def controlador_viagem(self):
+        return self.__controlador_viagem
+
     def inicializa_sistema(self):
         while True:
             opcao = self.__tela_principal.tela_opcoes()
@@ -85,7 +95,8 @@ class ControladorControladores:
                 self.__controlador_pessoa.abre_tela()
 
             elif opcao == 6:
-                sg.popup("⚠️ Módulo de Viagem ainda não implementado.")
+                # --- AGORA CHAMA A TELA DE VIAGEM ---
+                self.__controlador_viagem.abre_tela()
 
             elif opcao == 7:
                 self.__controlador_pagamento.abre_tela()
