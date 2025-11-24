@@ -86,7 +86,7 @@ class TelaViagem:
         layout = [
             [sg.Text('Selecione o novo status:')],
             [sg.Combo(['Pendente', 'Confirmada', 'Em Curso', 'Concluída', 'Cancelada'],
-                      default_value='Pendente', key='status')],
+                    default_value='Pendente', key='status')],
             [sg.Button('Confirmar'), sg.Button('Cancelar', key='-CANCELAR-')]
         ]
         window = sg.Window('Atualizar Status', layout)

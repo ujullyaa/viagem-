@@ -42,10 +42,10 @@ class ControladorViagem:
             else:
                 self.__tela.mostra_mensagem("⚠️ Opção inválida.")
 
-        self.retornar_menu()
+        self.retornar()
 
-    def retornar_menu(self):
-        self.__controlador_sistema.inicializa_sistema()
+    def retornar(self):
+        return
 
     # --- CADASTRAR VIAGEM (Mantido) ---
     def cadastrar_viagem(self):
