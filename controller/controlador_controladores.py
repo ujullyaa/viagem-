@@ -4,18 +4,17 @@ from controller.controlador_meio_transporte import ControladorMeioTransporte
 from controller.controlador_itinerario import ControladorItinerario
 from controller.controlador_passagem import ControladorPassagem
 from controller.controlador_pagamento import ControladorPagamento
-# --- NOVO IMPORT ---
-from controller.controlador_viagem import ControladorViagem 
+from controller.controlador_viagem import ControladorViagem
 from view.tela_controladores import TelaControladores
 import FreeSimpleGUI as sg
 
 
 class ControladorControladores:
     def __init__(self):
-        # --- INSTÂNCIAS DOS CONTROLADORES ---
         self.__controlador_pessoa = ControladorPessoa(self)
 
-        self.__controlador_empresa_transporte = ControladorEmpresaTransporte(self)
+        self.__controlador_empresa_transporte = ControladorEmpresaTransporte(
+            self)
 
         self.__controlador_meio_transporte = ControladorMeioTransporte(
             self,
@@ -33,15 +32,9 @@ class ControladorControladores:
 
         self.__controlador_pagamento = ControladorPagamento(self)
 
-        # --- INSTANCIANDO A VIAGEM ---
         self.__controlador_viagem = ControladorViagem(self)
 
-        # Tela principal
         self.__tela_principal = TelaControladores()
-
-    # ------------------------------------------------------------
-    #                  GETTERS PÚBLICOS (IMPORTANTE!)
-    # ------------------------------------------------------------
 
     @property
     def controlador_pessoa(self):
@@ -67,7 +60,6 @@ class ControladorControladores:
     def controlador_pagamento(self):
         return self.__controlador_pagamento
 
-    # --- GETTER DA VIAGEM ---
     @property
     def controlador_viagem(self):
         return self.__controlador_viagem
@@ -95,7 +87,6 @@ class ControladorControladores:
                 self.__controlador_pessoa.abre_tela()
 
             elif opcao == 6:
-                # --- AGORA CHAMA A TELA DE VIAGEM ---
                 self.__controlador_viagem.abre_tela()
 
             elif opcao == 7:

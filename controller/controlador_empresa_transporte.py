@@ -4,6 +4,7 @@ from daos.empresa_transporte_dao import EmpresaTransporteDAO
 from exceptions.elemento_nao_existe_exception import ElementoNaoExisteException
 from exceptions.elemento_repetido_exception import ElementoRepetidoException
 
+
 class ControladorEmpresaTransporte:
 
     def __init__(self, controlador_controladores):
@@ -14,9 +15,10 @@ class ControladorEmpresaTransporte:
     @property
     def empresas(self):
         return self.__empresa_dao.get_all()
-    
+
     def __limpa_numeros(self, s: str) -> str:
-        if s is None: return ""
+        if s is None:
+            return ""
         return ''.join(ch for ch in str(s) if ch.isdigit())
 
     def __validar_cnpj(self, cnpj: str) -> bool:
@@ -35,7 +37,8 @@ class ControladorEmpresaTransporte:
 
     def incluir_empresa(self):
         dados = self.__tela.pega_dados_empresa()
-        if not dados: return
+        if not dados:
+            return
 
         try:
             cnpj_limpo = self.__limpa_numeros(dados.get("cnpj", ""))
@@ -50,7 +53,8 @@ class ControladorEmpresaTransporte:
                 return
 
             if self.pega_empresa_por_cnpj(cnpj_limpo):
-                raise ElementoRepetidoException(f"Empresa com CNPJ {cnpj_limpo} já existe.")
+                raise ElementoRepetidoException(
+                    f"Empresa com CNPJ {cnpj_limpo} já existe.")
 
             empresa = EmpresaTransporte(
                 nome_empresa=dados.get("nome", "").strip(),
@@ -72,15 +76,17 @@ class ControladorEmpresaTransporte:
                 return
 
             cnpj_selecionado = self.__tela.seleciona_empresa(empresas)
-            if not cnpj_selecionado: return
+            if not cnpj_selecionado:
+                return
 
             empresa = self.pega_empresa_por_cnpj(cnpj_selecionado)
-            
+
             if not empresa:
                 raise ElementoNaoExisteException("Empresa não encontrada.")
 
             dados = self.__tela.pega_dados_empresa(empresa)
-            if not dados: return
+            if not dados:
+                return
 
             telefone_limpo = self.__limpa_numeros(dados.get("telefone", ""))
 
@@ -112,26 +118,26 @@ class ControladorEmpresaTransporte:
                 return
 
             cnpj = self.__tela.seleciona_empresa(empresas)
-            if not cnpj: return
+            if not cnpj:
+                return
 
             empresa = self.pega_empresa_por_cnpj(cnpj)
-            
+
             if not empresa:
                 raise ElementoNaoExisteException("Empresa não encontrada.")
 
-            # --- EXCLUSÃO EM CASCATA (NOVIDADE) ---
-            # Antes de excluir a empresa, remove os veículos dela
-            self.__controlador_controladores.controlador_meio_transporte.excluir_veiculos_da_empresa(empresa)
+            self.__controlador_controladores.controlador_meio_transporte.excluir_veiculos_da_empresa(
+                empresa)
 
-            # Agora remove a empresa
             self.__empresa_dao.remove(empresa.cnpj)
-            self.__tela.mostra_mensagem("Empresa e seus veículos removidos com sucesso!")
+            self.__tela.mostra_mensagem(
+                "Empresa e seus veículos removidos com sucesso!")
 
         except ElementoNaoExisteException as e:
             self.__tela.mostra_mensagem(str(e))
 
     def retornar(self):
-        return 
+        return
 
     def abre_tela(self):
         opcoes = {
@@ -144,10 +150,10 @@ class ControladorEmpresaTransporte:
 
         while True:
             escolha = self.__tela.tela_opcoes()
-            
+
             if escolha == 0:
                 break
-            
+
             funcao = opcoes.get(escolha)
             if funcao:
                 funcao()

@@ -1,103 +1,149 @@
 import FreeSimpleGUI as sg
 
+
 class TelaViagem:
     def __init__(self):
-        sg.theme("DarkBlue3")
+        sg.theme('DarkBlue3')
 
     def tela_opcoes(self):
+
         layout = [
-            [sg.Column(
-                [
-                    [sg.Text("✈️ Menu Viagem", font=("Segoe UI", 18, "bold"))],
-                    [sg.HorizontalSeparator()],
-                    [sg.Button("1 - Cadastrar Viagem", size=(35, 1))],
-                    [sg.Button("2 - Listar Viagens", size=(35, 1))],
-                    [sg.Button("3 - Reservar Viagem", size=(35, 1))],
-                    [sg.Button("4 - Cancelar Viagem", size=(35, 1))],
-                    [sg.Button("5 - Atualizar Status", size=(35, 1))],
-                    [sg.Button("6 - Excluir Viagem", size=(35, 1))],
-                    [sg.HorizontalSeparator()],
-                    [sg.Button("0 - Voltar ao Menu Principal", button_color=("white", "red"), size=(35, 1))]
-                ],
-                element_justification="center",
-                expand_x=True
-            )]
+            [sg.Text('Sistema de Gerenciamento de Viagens',
+                     font='Arial 18', justification='center')],
+            [sg.HSeparator()],
+            [sg.Button('1 - Cadastrar Viagem', key=1, size=(30, 2))],
+            [sg.Button('2 - Listar Viagens', key=2, size=(30, 2))],
+            [sg.Button('3 - Reservar Viagem', key=3, size=(30, 2))],
+            [sg.Button('4 - Cancelar Passagem', key=4, size=(30, 2))],
+            [sg.Button('5 - Atualizar Status', key=5, size=(30, 2))],
+            [sg.Button('6 - Alterar Viagem', key=6, size=(30, 2))],
+            [sg.Button('7 - Excluir Viagem', key=7, size=(30, 2))],
+            [sg.Button('0 - Voltar ao Menu Principal', key='-VOLTAR-',
+                       size=(30, 2), button_color=('white', 'firebrick3'))]
         ]
 
-        window = sg.Window("Menu Viagem", layout, element_justification="center", size=(600, 600))
-        event, _ = window.read()
+        window = sg.Window('Menu Viagens', layout,
+                           finalize=True, element_justification='center')
+        event, values = window.read()
         window.close()
 
-        if event in (sg.WINDOW_CLOSED, "0 - Voltar ao Menu Principal"): return 0
-        # Mapeamento simples de string para int
-        opcoes = {
-            "1 - Cadastrar Viagem": 1, "2 - Listar Viagens": 2, "3 - Reservar Viagem": 3,
-            "4 - Cancelar Viagem": 4, "5 - Atualizar Status": 5, "6 - Excluir Viagem": 6
-        }
-        return opcoes.get(event, 0)
+        if event == '-VOLTAR-':
+            return 0
+
+        return event
 
     def pega_dados_viagem(self):
+
         layout = [
-            [sg.Text("✈️ Cadastro de Viagem", font=("Segoe UI", 14, "bold"))],
-            [sg.HorizontalSeparator()],
-            [sg.Text("Código:", size=(15,1)), sg.Input(key="codigo", size=(45,1))],
-            [sg.Text("CPF Pessoa:", size=(15,1)), sg.Input(key="pessoa", size=(45,1))],
-            [sg.Text("Partida:", size=(15,1)), sg.Input(key="data_partida", size=(45,1))],
-            [sg.Text("Chegada:", size=(15,1)), sg.Input(key="data_chegada", size=(45,1))],
-            # Adicione mais campos se necessário (meio, empresa, etc)
-            # Para simplificar a UI, assumimos que o controlador trata o resto ou pedimos aqui
-            [sg.HorizontalSeparator()],
-            [sg.Button("💾 Confirmar", key="confirmar", size=(20,1)), sg.Button("↩️ Cancelar", key="cancelar", size=(20,1))]
+            [sg.Text('Código da Viagem:', size=(20, 1)),
+             sg.Input(key='codigo')],
+            [sg.Text('CPF do Passageiro:', size=(20, 1)), sg.Input(key='cpf')],
+            [sg.Text('Data Partida (dd/mm/aaaa):', size=(20, 1)),
+             sg.Input(key='data_partida')],
+            [sg.Text('Data Chegada (dd/mm/aaaa):', size=(20, 1)),
+             sg.Input(key='data_chegada')],
+            [sg.Button('Confirmar', key='confirmar'),
+             sg.Button('Cancelar', key='-CANCELAR-')]
         ]
 
-        window = sg.Window("Dados Viagem", layout, element_justification="center")
+        window = sg.Window('Cadastrar Viagem', layout)
         event, values = window.read()
         window.close()
 
-        if event == "confirmar":
-            return {
-                "codigo": values["codigo"],
-                "pessoa": values["pessoa"],
-                "data_partida": values["data_partida"],
-                "data_chegada": values["data_chegada"],
-                # Os campos complexos (objetos) idealmente são selecionados via ID ou listas separadas
-                # Aqui retornamos o básico para o controlador buscar
-                "itinerario": None, "meio_transporte": None, "empresa_transporte": None, "pagamento": None
-            }
-        return None
+        if event != 'confirmar':
+            return None
 
-    def mostra_viagens(self, viagens_lista):
-        # viagens_lista deve ser lista de dicts: [{'codigo':..., 'destino':...}]
-        if not viagens_lista:
-            sg.popup("Nenhuma viagem cadastrada.", title="Aviso")
-            return
+        return {
+            'codigo': values['codigo'], 'cpf': values['cpf'],
+            'data_partida': values['data_partida'], 'data_chegada': values['data_chegada']
+        }
 
-        headers = ["Código", "Destino", "Data"]
-        rows = [[v['codigo'], v['destino'], v['data']] for v in viagens_lista]
+    def mostra_viagens(self, lista):
+        texto = '\n'.join(
+            [f"Código: {v.get('codigo', 'N/A')} | Partida: {v.get('data', 'N/A')} | Status: {v.get('status', 'N/A')} | Passagens: {v.get('passagens', 0)}" for v in lista])
 
-        layout = [
-            [sg.Text("📋 Viagens Cadastradas", font=("Segoe UI", 14, "bold"))],
-            [sg.Table(values=rows, headings=headers, max_col_width=50, auto_size_columns=True,
-                    justification='center', key="tab", expand_x=True, expand_y=True)],
-            [sg.Button("Voltar", size=(20,1))]
-        ]
-        window = sg.Window("Lista", layout, size=(800, 400), element_justification="center")
-        window.read()
-        window.close()
+        sg.popup_scrolled(
+            texto if texto else 'Nenhuma viagem cadastrada.', title='Lista de Viagens', size=(50, 10))
 
     def seleciona_viagem(self):
+
         layout = [
-            [sg.Text("Digite o código da viagem:", font=("Segoe UI", 12))],
-            [sg.Input(key="codigo", size=(45,1))],
-            [sg.Button("Confirmar"), sg.Button("Cancelar")]
+            [sg.Text('Digite o código da viagem:')],
+            [sg.Input(key='codigo')],
+            [sg.Button('OK'), sg.Button('Cancelar', key='-CANCELAR-')]
         ]
-        window = sg.Window("Seleção", layout, element_justification="center")
+
+        window = sg.Window('Selecionar Viagem', layout)
         event, values = window.read()
         window.close()
 
-        if event == "Confirmar":
-            return values["codigo"]
+        if event != 'OK':
+            return None
+
+        return values['codigo']
+
+    def pega_novo_status(self):
+        layout = [
+            [sg.Text('Selecione o novo status:')],
+            [sg.Combo(['Pendente', 'Confirmada', 'Em Curso', 'Concluída', 'Cancelada'],
+                      default_value='Pendente', key='status')],
+            [sg.Button('Confirmar'), sg.Button('Cancelar', key='-CANCELAR-')]
+        ]
+        window = sg.Window('Atualizar Status', layout)
+        event, values = window.read()
+        window.close()
+
+        if event == 'Confirmar':
+            return values['status']
         return None
 
+    def seleciona_passagem(self, lista_passagens: list):
+        if not lista_passagens:
+            self.mostra_mensagem(
+                "Não há passagens disponíveis para selecionar.")
+            return None
+
+        codigos = [p['codigo'] for p in lista_passagens]
+
+        layout = [
+            [sg.Text('Selecione o código da passagem para cancelar:')],
+            [sg.Combo(codigos, key='cod_passagem')],
+            [sg.Button('OK'), sg.Button('Cancelar', key='-CANCELAR-')]
+        ]
+
+        window = sg.Window('Cancelar Passagem', layout)
+        event, values = window.read()
+        window.close()
+
+        if event == 'OK':
+            return values['cod_passagem']
+        return None
+
+    def pega_dados_alteracao(self, dados_atuais):
+        layout = [
+            [sg.Text('Alterar Dados da Viagem', font='Arial 14')],
+
+            [sg.Text('Data Partida:'), sg.Input(
+                default_text=dados_atuais.get('data_partida', ''), key='data_partida')],
+            [sg.Text('Data Chegada:'), sg.Input(
+                default_text=dados_atuais.get('data_chegada', ''), key='data_chegada')],
+            [sg.Text('Status Atual:'), sg.Input(
+                default_text=dados_atuais.get('status', ''), key='status')],
+            [sg.Text('CPF do Passageiro:'), sg.Input(
+                default_text=dados_atuais.get('cpf', ''), key='cpf')],
+
+            [sg.Button('Salvar', key='salvar'), sg.Button(
+                'Cancelar', key='-CANCELAR-')]
+        ]
+
+        window = sg.Window('Alterar Viagem', layout)
+        event, values = window.read()
+        window.close()
+
+        if event != 'salvar':
+            return None
+
+        return values
+
     def mostra_mensagem(self, msg):
-        sg.popup(msg, title="Mensagem", font=("Segoe UI", 11))
+        sg.popup(msg)

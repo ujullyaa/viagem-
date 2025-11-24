@@ -1,178 +1,188 @@
-from view.tela_viagem import TelaViagem
-from model.viagem import Viagem
-from model.pessoa import Pessoa
+import FreeSimpleGUI as sg
 from daos.viagem_dao import ViagemDAO
-# --- IMPORTS DAS EXCEPTIONS ---
-from exceptions.elemento_nao_existe_exception import ElementoNaoExisteException
-from exceptions.elemento_repetido_exception import ElementoRepetidoException
+from model.viagem import Viagem
+from view.tela_viagem import TelaViagem
+from daos.pessoa_dao import PessoaDAO
+
 
 class ControladorViagem:
-    def __init__(self, controlador_controladores):
-        self.__viagem_dao = ViagemDAO()
-        self.__tela_viagem = TelaViagem()
-        self.__controlador_controladores = controlador_controladores
+    def __init__(self, controlador_sistema):
+        self.__controlador_sistema = controlador_sistema
+        self.__dao = ViagemDAO()
+        self.__tela = TelaViagem()
+        self.__pessoa_dao = PessoaDAO()
+        # Inicialização das DAOs de relacionamento (Itinerario, MeioTransporte, etc.)
+        # ...
 
-    def pega_viagem_por_codigo(self, codigo):
-        # CORREÇÃO: Adicionado () no get_all
-        for viagem in self.__viagem_dao.get_all():
-            if str(viagem.codigo) == str(codigo):
-                return viagem
-        return None
-
-    def incluir_viagem(self):
-        dados_viagem = self.__tela_viagem.pega_dados_viagem()
-        if not dados_viagem: return
-
-        try:
-            # EXCEPTION: Elemento Repetido
-            if self.pega_viagem_por_codigo(dados_viagem["codigo"]) is not None:
-                raise ElementoRepetidoException(f"Viagem com código {dados_viagem['codigo']} já existe!")
-
-            # Busca passageiro (opcional na sua lógica original, mas vamos validar)
-            # Se a sua tela pede um CPF de 'pessoa', validamos:
-            # Nota: Ajuste a chave ["pessoa"] conforme o retorno real da sua tela_viagem
-            if "pessoa" in dados_viagem and dados_viagem["pessoa"]:
-                cpf = dados_viagem["pessoa"]
-                pessoa = self.__controlador_controladores.controlador_pessoa.pega_pessoa_por_cpf(cpf)
-                
-                # EXCEPTION: Elemento Não Existe
-                if pessoa is None:
-                    raise ElementoNaoExisteException(f"Passageiro com CPF {cpf} não encontrado.")
-            else:
-                # Se a lógica permitir criar sem pessoa, trate aqui
-                pessoa = None 
-
-            # Instancia Viagem (Assumindo que todos os objetos necessários venham do dados_viagem ou sejam None)
-            # Nota: O model Viagem exige muitos objetos (itinerario, transporte, etc).
-            # Se a tela retorna apenas strings, você precisaria buscar esses objetos nos outros controladores aqui.
-            # Mantendo simples conforme seu código original:
-            nova_viagem = Viagem(
-                codigo=dados_viagem["codigo"],
-                data_partida=dados_viagem["data_partida"],
-                data_chegada=dados_viagem["data_chegada"],
-                itinerario=dados_viagem.get("itinerario"),       # Cuidado: Model espera Objeto
-                meio_transporte=dados_viagem.get("meio_transporte"), # Model espera Objeto
-                empresa_transporte=dados_viagem.get("empresa_transporte"), # Model espera Objeto
-                status="Agendada",
-                preco_base=0.0, 
-                pagamento=dados_viagem.get("pagamento"), # Model espera Objeto
-                passageiro=pessoa
-            )
-
-            self.__viagem_dao.add(nova_viagem)
-            self.__tela_viagem.mostra_mensagem("Viagem cadastrada com sucesso!")
-
-        except (ElementoRepetidoException, ElementoNaoExisteException) as e:
-            self.__tela_viagem.mostra_mensagem(str(e))
-
-    def listar_viagens(self):
-        # CORREÇÃO: Adicionado () no get_all
-        viagens = self.__viagem_dao.get_all()
-        if not viagens:
-            self.__tela_viagem.mostra_mensagem("Nenhuma viagem cadastrada.")
-            return
-
-        # Ajuste para exibir corretamente (convertendo objetos para string se necessario)
-        lista_exibicao = []
-        for v in viagens:
-            lista_exibicao.append({
-                "codigo": v.codigo,
-                "destino": v.itinerario.destino if v.itinerario else "N/A", # Exemplo de acesso seguro
-                "data": v.data_partida,
-                "horario": "N/A" # Seu model não tem horário separado, talvez data_partida tenha
-            })
-        self.__tela_viagem.mostra_viagens(lista_exibicao)
-
-    def reservar_viagem(self):
-        try:
-            self.listar_viagens()
-            codigo = self.__tela_viagem.seleciona_viagem()
-            if not codigo: return
-
-            viagem = self.pega_viagem_por_codigo(codigo)
-
-            # EXCEPTION: Elemento Não Existe
-            if viagem is None:
-                raise ElementoNaoExisteException("Viagem não encontrada.")
-
-            passageiro_nome = input("Nome do passageiro: ") # Ideal seria usar a tela GUI
-            assento = input("Número do assento: ")
-            passageiro = Pessoa(passageiro_nome, 0, "", "") 
-            
-            if viagem.reservar_passagem(passageiro, assento):
-                self.__tela_viagem.mostra_mensagem("Reserva realizada!")
-            else:
-                self.__tela_viagem.mostra_mensagem("Falha ao reservar (indisponível).")
-
-        except ElementoNaoExisteException as e:
-            self.__tela_viagem.mostra_mensagem(str(e))
-
-    def cancelar_viagem(self):
-        try:
-            codigo = self.__tela_viagem.seleciona_viagem()
-            viagem = self.pega_viagem_por_codigo(codigo)
-
-            if viagem is None:
-                raise ElementoNaoExisteException("Viagem não encontrada.")
-
-            # Aqui precisaria de uma GUI para pedir o número da passagem
-            # Como está usando input(), vai travar a GUI, mas mantendo a lógica original:
-            num_passagem = input("Número da passagem a cancelar: ") 
-            
-            if viagem.cancelar_passagem(num_passagem):
-                self.__tela_viagem.mostra_mensagem("Passagem cancelada!")
-            else:
-                self.__tela_viagem.mostra_mensagem("Passagem não encontrada nesta viagem.")
-
-        except ElementoNaoExisteException as e:
-            self.__tela_viagem.mostra_mensagem(str(e))
-
-    def atualizar_viagem(self):
-        try:
-            codigo = self.__tela_viagem.seleciona_viagem()
-            viagem = self.pega_viagem_por_codigo(codigo)
-
-            if not viagem:
-                raise ElementoNaoExisteException("Viagem não encontrada.")
-
-            novo_status = input("Novo status: ") # Ideal seria GUI
-            viagem.atualizar_status(novo_status)
-            self.__viagem_dao.update(viagem) # Faltava salvar no DAO
-            self.__tela_viagem.mostra_mensagem("Status atualizado!")
-
-        except ElementoNaoExisteException as e:
-            self.__tela_viagem.mostra_mensagem(str(e))
-
-    def excluir_viagem(self):
-        try:
-            codigo = self.__tela_viagem.seleciona_viagem()
-            viagem = self.pega_viagem_por_codigo(codigo)
-
-            if not viagem:
-                raise ElementoNaoExisteException("Viagem não encontrada para exclusão.")
-
-            self.__viagem_dao.remove(viagem.codigo) # Passar a chave (código), não o objeto
-            self.__tela_viagem.mostra_mensagem("Viagem excluída!")
-
-        except ElementoNaoExisteException as e:
-            self.__tela_viagem.mostra_mensagem(str(e))
-
-    def retornar(self):
-        return
-
+    # ---------- LOOP PRINCIPAL ----------
     def abre_tela(self):
         opcoes = {
-            1: self.incluir_viagem,
+            1: self.cadastrar_viagem,
             2: self.listar_viagens,
             3: self.reservar_viagem,
-            4: self.cancelar_viagem,
-            5: self.atualizar_viagem,
-            6: self.excluir_viagem,
-            0: self.retornar
+            4: self.cancelar_passagem,
+            5: self.atualizar_status,
+
+            # 🚨 CORREÇÃO ESSENCIAL: CHAVES INVERTIDAS
+            6: self.alterar_viagem,  # 6 - Alterar Viagem chama ALTERAR
+            7: self.excluir_viagem  # 7 - Excluir Viagem chama EXCLUIR
         }
+
         while True:
-            opcao = self.__tela_viagem.tela_opcoes()
-            funcao = opcoes.get(opcao)
-            if opcao == 0: funcao(); break
-            elif funcao: funcao()
-            else: self.__tela_viagem.mostra_mensagem("Opção inválida.")
+            opcao = self.__tela.tela_opcoes()
+
+            # 🛑 FECHAMENTO: Trata 'X' na janela (sg.WIN_CLOSED) e '0 - Voltar ao Menu'
+            if opcao == sg.WIN_CLOSED or opcao == 0:
+                break
+
+            acao = opcoes.get(opcao)
+
+            if acao:
+                acao()
+            else:
+                self.__tela.mostra_mensagem("⚠️ Opção inválida.")
+
+        self.retornar_menu()
+
+    def retornar_menu(self):
+        self.__controlador_sistema.inicializa_sistema()
+
+    # --- CADASTRAR VIAGEM (Mantido) ---
+    def cadastrar_viagem(self):
+        dados = self.__tela.pega_dados_viagem()
+        if not dados:
+            return
+
+        pessoa = self.__pessoa_dao.get(dados.get("cpf"))
+        if not pessoa:
+            self.__tela.mostra_mensagem("❌ Passageiro (CPF) não encontrado.")
+            return
+
+        # Busca dos objetos de relacionamento (Itinerario, Meio, Empresa) - placeholders por enquanto
+        itinerario = None
+        meio_transporte = None
+        empresa_transporte = None
+
+        nova = Viagem(
+            codigo=dados.get("codigo"), data_partida=dados.get("data_partida"),
+            data_chegada=dados.get("data_chegada"), itinerario=itinerario,
+            meio_transporte=meio_transporte, empresa_transporte=empresa_transporte,
+            status="Pendente", preco_base=0.0, pagamento=None, passageiro=pessoa
+        )
+        self.__dao.add(nova)
+        self.__tela.mostra_mensagem("✔️ Viagem cadastrada com sucesso!")
+
+    # --- LISTAR VIAGENS (Mantido) ---
+    def listar_viagens(self):
+        viagens = self.__dao.get_all()
+        dados = []
+        for v in viagens:
+            dados.append({
+                "codigo": v.codigo, "data": v.data_partida, "status": v.status,
+                "passagens": len(v.listar_passagens())
+            })
+        self.__tela.mostra_viagens(dados)
+
+    # --- RESERVAR VIAGEM (Mantido) ---
+    def reservar_viagem(self):
+        codigo = self.__tela.seleciona_viagem()
+        if not codigo:
+            return
+
+        viagem = self.__dao.get(codigo)
+        if not viagem:
+            self.__tela.mostra_mensagem("❌ Viagem não encontrada.")
+            return
+
+        assento = "A" + str(len(viagem.listar_passagens()) + 1)
+        passagem = viagem.reservar_passagem(viagem.passageiro, assento)
+
+        self.__dao.update(viagem)
+        self.__tela.mostra_mensagem(
+            f"✔️ Passagem reservada!\nCódigo: {passagem['codigo']}\nAssento: {assento}"
+        )
+
+    # --- CANCELAR PASSAGEM (Mantido) ---
+    def cancelar_passagem(self):
+        codigo = self.__tela.seleciona_viagem()
+        if not codigo:
+            return
+
+        viagem = self.__dao.get(codigo)
+        if not viagem:
+            self.__tela.mostra_mensagem("❌ Viagem não encontrada.")
+            return
+
+        lista = viagem.listar_passagens()
+        if not lista:
+            self.__tela.mostra_mensagem("❌ Não há passagens nesta viagem.")
+            return
+
+        cod_pass = self.__tela.seleciona_passagem(lista)
+        if not cod_pass:
+            return
+
+        if viagem.cancelar_passagem(cod_pass):
+            self.__dao.update(viagem)
+            self.__tela.mostra_mensagem("✔️ Passagem cancelada com sucesso!")
+        else:
+            self.__tela.mostra_mensagem("❌ Código da passagem não encontrado.")
+
+    # --- ATUALIZAR STATUS (Mantido) ---
+    def atualizar_status(self):
+        codigo = self.__tela.seleciona_viagem()
+        if not codigo:
+            return
+
+        viagem = self.__dao.get(codigo)
+        if not viagem:
+            self.__tela.mostra_mensagem("❌ Viagem não encontrada.")
+            return
+
+        novo_status = self.__tela.pega_novo_status()
+
+        if novo_status:
+            viagem.status = novo_status
+            self.__dao.update(viagem)
+            self.__tela.mostra_mensagem("✔️ Status atualizado!")
+        else:
+            self.__tela.mostra_mensagem("❌ Atualização de status cancelada.")
+
+    # --- ALTERAR VIAGEM (Mantido) ---
+    def alterar_viagem(self):
+        codigo = self.__tela.seleciona_viagem()
+        if not codigo:
+            return
+
+        viagem = self.__dao.get(codigo)
+        if not viagem:
+            self.__tela.mostra_mensagem("❌ Viagem não encontrada.")
+            return
+
+        dados_atuais = {
+            "data_partida": viagem.data_partida,
+            "data_chegada": viagem.data_chegada,
+            "cpf": viagem.passageiro.cpf,
+            "status": viagem.status
+        }
+
+        novos = self.__tela.pega_dados_alteracao(dados_atuais)
+        if not novos:
+            self.__tela.mostra_mensagem("Alteração da viagem cancelada.")
+            return
+
+        viagem.data_partida = novos.get("data_partida", viagem.data_partida)
+        viagem.data_chegada = novos.get("data_chegada", viagem.data_chegada)
+        viagem.status = novos.get("status", viagem.status)
+
+        self.__dao.update(viagem)
+        self.__tela.mostra_mensagem("✔️ Viagem alterada com sucesso!")
+
+    # --- EXCLUIR VIAGEM (Mantido) ---
+    def excluir_viagem(self):
+        codigo = self.__tela.seleciona_viagem()
+        if not codigo:
+            return
+
+        self.__dao.remove(codigo)
+        self.__tela.mostra_mensagem("✔️ Viagem excluída!")

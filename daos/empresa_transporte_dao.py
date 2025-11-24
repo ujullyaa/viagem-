@@ -2,6 +2,7 @@ from daos.dao import DAO
 from model.empresa_transporte import EmpresaTransporte
 import re
 
+
 class EmpresaTransporteDAO(DAO):
     def __init__(self):
         super().__init__('empresa_transporte.pkl')
@@ -37,5 +38,4 @@ class EmpresaTransporteDAO(DAO):
         super().remove(cnpj)
 
     def get_all(self):
-        # ✔️ Agora funciona perfeitamente
         return list(super().get_all())

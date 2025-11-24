@@ -5,6 +5,7 @@ from daos.pagamento_dao import PagamentoDAO
 from exceptions.elemento_nao_existe_exception import ElementoNaoExisteException
 from exceptions.elemento_repetido_exception import ElementoRepetidoException
 
+
 class ControladorPagamento:
     def __init__(self, controlador_controladores):
         self.__pagamento_dao = PagamentoDAO()
@@ -17,7 +18,6 @@ class ControladorPagamento:
                 return pagamento
         return None
 
-    # --- HELPER PARA MONTAR DADOS ---
     def __monta_lista_dados(self):
         pagamentos = self.__pagamento_dao.get_all()
         lista = []
@@ -35,7 +35,8 @@ class ControladorPagamento:
     def incluir_pagamento(self):
         try:
             dados_pagamento = self.__tela_pagamento.pega_dados_pagamento()
-            if not dados_pagamento: return
+            if not dados_pagamento:
+                return
 
             forma_pagamento = dados_pagamento["forma_pagamento"]
             passageiro = self.__controlador_controladores.controlador_pessoa.pega_pessoa_por_cpf(
@@ -53,19 +54,22 @@ class ControladorPagamento:
 
             if forma_pagamento == "cartao":
                 dados_cartao = self.__tela_pagamento.pega_dados_cartao()
-                if not dados_cartao: return
+                if not dados_cartao:
+                    return
                 pagamento = Cartao("cartao", pagou, data, valor_total, passageiro,
                                    dados_cartao["numero_cartao"], dados_cartao["validade"],
                                    dados_cartao["bandeira"], dados_cartao["nome_titular"])
 
             elif forma_pagamento == "pix":
                 dados_pix = self.__tela_pagamento.pega_dados_pix()
-                if not dados_pix: return
+                if not dados_pix:
+                    return
                 pagamento = Pix("pix", pagou, data, valor_total, passageiro,
                                 dados_pix["chave_pix"], dados_pix["banco"])
 
             elif forma_pagamento == "cedulas":
-                pagamento = Cedula("cedulas", pagou, data, valor_total, passageiro)
+                pagamento = Cedula("cedulas", pagou, data,
+                                   valor_total, passageiro)
             else:
                 self.__tela_pagamento.mostra_mensagem("Forma inválida.")
                 return
@@ -85,32 +89,34 @@ class ControladorPagamento:
         try:
             lista_dados = self.__monta_lista_dados()
             if not lista_dados:
-                self.__tela_pagamento.mostra_mensagem("Nenhum pagamento cadastrado.")
+                self.__tela_pagamento.mostra_mensagem(
+                    "Nenhum pagamento cadastrado.")
                 return
 
             codigo = self.__tela_pagamento.seleciona_pagamento(lista_dados)
-            if not codigo: return
+            if not codigo:
+                return
 
             pagamento = self.pega_pagamento_por_codigo(codigo)
             if not pagamento:
                 raise ElementoNaoExisteException("Pagamento não encontrado.")
 
-            # Passa o objeto existente para preencher a tela
             novos_dados = self.__tela_pagamento.pega_dados_pagamento(pagamento)
-            if not novos_dados: return
+            if not novos_dados:
+                return
 
-            # Atualiza dados básicos
             pagamento.valor_total = float(novos_dados["valor_total"])
             pagamento.data = novos_dados["data"]
             pagamento.pagou = novos_dados["pagou"]
-            
-            # Opcional: Atualizar passageiro se o CPF mudar
-            passageiro_novo = self.__controlador_controladores.controlador_pessoa.pega_pessoa_por_cpf(novos_dados["cpf_passageiro"])
+
+            passageiro_novo = self.__controlador_controladores.controlador_pessoa.pega_pessoa_por_cpf(
+                novos_dados["cpf_passageiro"])
             if passageiro_novo:
-                pagamento.passageiro = passageiro_novo # (Precisa ter o setter no model)
+                pagamento.passageiro = passageiro_novo
 
             self.__pagamento_dao.update(pagamento)
-            self.__tela_pagamento.mostra_mensagem("Pagamento alterado com sucesso!")
+            self.__tela_pagamento.mostra_mensagem(
+                "Pagamento alterado com sucesso!")
 
         except ElementoNaoExisteException as e:
             self.__tela_pagamento.mostra_mensagem(str(e))
@@ -129,7 +135,8 @@ class ControladorPagamento:
                 return
 
             codigo = self.__tela_pagamento.seleciona_pagamento(lista_dados)
-            if not codigo: return
+            if not codigo:
+                return
 
             pagamento = self.pega_pagamento_por_codigo(codigo)
             if not pagamento:
@@ -146,15 +153,18 @@ class ControladorPagamento:
 
     def abre_tela(self):
         opcoes = {
-            1: self.incluir_pagamento, 
-            2: self.alterar_pagamento, 
-            3: self.listar_pagamentos, 
-            4: self.excluir_pagamento, 
+            1: self.incluir_pagamento,
+            2: self.alterar_pagamento,
+            3: self.listar_pagamentos,
+            4: self.excluir_pagamento,
             0: self.retornar
         }
         while True:
             opcao = self.__tela_pagamento.tela_opcoes()
-            if opcao == 0: break
+            if opcao == 0:
+                break
             funcao = opcoes.get(opcao)
-            if funcao: funcao()
-            else: self.__tela_pagamento.mostra_mensagem("Opção inválida.")
+            if funcao:
+                funcao()
+            else:
+                self.__tela_pagamento.mostra_mensagem("Opção inválida.")
