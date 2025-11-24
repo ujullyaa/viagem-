@@ -23,8 +23,13 @@ class TelaEmpresaTransporte:
         ]
 
         window = sg.Window("Menu Empresa", layout, element_justification="center")
-        event, _ = window.read()
+        resultado = window.read()
         window.close()
+        
+        if resultado is None:
+            event = sg.WINDOW_CLOSED
+        else:
+            event = resultado[0]
 
         if event in (sg.WINDOW_CLOSED, "0 - Voltar ao Menu Principal"): return 0
         if event == "1 - Incluir Empresa": return 1
@@ -34,26 +39,68 @@ class TelaEmpresaTransporte:
         return 0
 
     def pega_dados_empresa(self, empresa=None):
-        nome = empresa.nome_empresa if empresa else ""
-        cnpj = empresa.cnpj if empresa else ""
-        tel = empresa.telefone if empresa else ""
+        # Valores Padrão
+        nome_val = empresa.nome_empresa if empresa else ""
+        cnpj_val = empresa.cnpj if empresa else ""
+        ddd_val = ""
+        num_val = ""
+
+        # Lógica para preencher DDD e Número se for edição
+        if empresa:
+            tel_completo = str(empresa.telefone)
+            tel_limpo = ''.join(filter(str.isdigit, tel_completo))
+            if len(tel_limpo) >= 2:
+                ddd_val = tel_limpo[:2]
+                num_val = tel_limpo[2:]
+            else:
+                num_val = tel_limpo
 
         layout = [
             [sg.Text("🏢 Cadastro de Empresa", font=("Segoe UI", 14, "bold"))],
             [sg.HorizontalSeparator()],
-            [sg.Text("Nome:", size=(15, 1)), sg.Input(nome, key="nome", size=(45, 1))],
-            [sg.Text("CNPJ:", size=(15, 1)), sg.Input(cnpj, key="cnpj", disabled=(empresa is not None), size=(45, 1))],
-            [sg.Text("Telefone:", size=(15, 1)), sg.Input(tel, key="telefone", size=(45, 1))],
+            [sg.Text("Nome:", size=(15, 1)), sg.Input(nome_val, key="nome", size=(45, 1))],
+            [sg.Text("CNPJ:", size=(15, 1)), sg.Input(cnpj_val, key="cnpj", disabled=(empresa is not None), size=(45, 1))],
+            
+            # --- Layout dividido para Telefone ---
+            [
+                sg.Text("Telefone:", size=(15, 1)), 
+                sg.Text("DDD", size=(4,1), justification='right'), 
+                sg.InputText(key="ddd", default_text=ddd_val, size=(5, 1)), 
+                sg.Text("Número", size=(6,1), justification='right'), 
+                sg.InputText(key="numero", default_text=num_val, size=(22, 1))
+            ],
+            [sg.Text("Ex: 48 e 3333-4444", font=("Segoe UI", 8), text_color="gray", pad=((140,0),(0,0)))],
+            
             [sg.HorizontalSeparator()],
             [sg.Button("💾 Confirmar", key="confirmar", size=(20, 1)), sg.Button("↩️ Cancelar", key="cancelar", size=(20, 1))]
         ]
 
         window = sg.Window("Dados Empresa", layout, element_justification="center")
-        event, values = window.read()
+        resultado = window.read()
         window.close()
 
-        if event == "confirmar":
-            return {"nome": values["nome"], "cnpj": values["cnpj"], "telefone": values["telefone"]}
+        if resultado is None:
+            event = sg.WINDOW_CLOSED
+            values = None
+        else:
+            event, values = resultado
+
+        if event == "confirmar" and values is not None:
+            # --- Lógica de Limpeza do Telefone ---
+            ddd_limpo = ''.join(filter(str.isdigit, values['ddd']))
+            numero_limpo = ''.join(filter(str.isdigit, values['numero']))
+            
+            # Verifica se o usuário repetiu o DDD no campo número
+            if ddd_limpo and numero_limpo.startswith(ddd_limpo) and len(numero_limpo) >= 10:
+                numero_limpo = numero_limpo[len(ddd_limpo):]
+
+            telefone_completo = ddd_limpo + numero_limpo
+
+            return {
+                "nome": values["nome"], 
+                "cnpj": values["cnpj"], 
+                "telefone": telefone_completo
+            }
         return None
 
     def mostra_empresas(self, empresas):
@@ -95,9 +142,15 @@ class TelaEmpresaTransporte:
         
         selected_cnpj = None
         while True:
-            event, values = window.read()
+            resultado = window.read()
+            if resultado is None:
+                break
+            
+            event, values = resultado
+            
             if event in (sg.WINDOW_CLOSED, "Cancelar"):
                 break
+            
             if event == "Confirmar":
                 if values["tabela"]:
                     idx = values["tabela"][0]

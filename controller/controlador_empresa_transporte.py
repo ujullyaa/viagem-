@@ -4,7 +4,6 @@ from daos.empresa_transporte_dao import EmpresaTransporteDAO
 from exceptions.elemento_nao_existe_exception import ElementoNaoExisteException
 from exceptions.elemento_repetido_exception import ElementoRepetidoException
 
-
 class ControladorEmpresaTransporte:
 
     def __init__(self, controlador_controladores):
@@ -22,12 +21,54 @@ class ControladorEmpresaTransporte:
         return ''.join(ch for ch in str(s) if ch.isdigit())
 
     def __validar_cnpj(self, cnpj: str) -> bool:
-        c = self.__limpa_numeros(cnpj)
-        return len(c) == 14
+        cnpj = self.__limpa_numeros(cnpj)
+        
+        
+        print(f"--- DEBUG CNPJ ---")
+        print(f"Recebido: {cnpj}")
+        print(f"Tamanho: {len(cnpj)}")
+
+        if len(cnpj) != 14:
+            print("Erro: Tamanho incorreto")
+            return False
+        
+        
+        if len(set(cnpj)) == 1:
+            print("Erro: Digitos repetidos")
+            return False
+
+        
+        lista_validacao_um = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+        soma = 0
+        for i in range(12):
+            soma += int(cnpj[i]) * lista_validacao_um[i]
+        
+        resto = soma % 11
+        digito_um = 0 if resto < 2 else 11 - resto
+
+        if digito_um != int(cnpj[12]):
+            print(f"Erro: Dígito 1 inválido. Esperado: {digito_um}, Recebido: {cnpj[12]}")
+            return False
+
+        
+        lista_validacao_dois = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+        soma = 0
+        for i in range(13):
+            soma += int(cnpj[i]) * lista_validacao_dois[i]
+            
+        resto = soma % 11
+        digito_dois = 0 if resto < 2 else 11 - resto
+
+        if digito_dois != int(cnpj[13]):
+            print(f"Erro: Dígito 2 inválido. Esperado: {digito_dois}, Recebido: {cnpj[13]}")
+            return False
+            
+        print("CNPJ Válido!")
+        return True
 
     def __validar_telefone(self, telefone: str) -> bool:
         t = self.__limpa_numeros(telefone)
-        return len(t) == 11
+        return 10 <= len(t) <= 11
 
     def pega_empresa_por_cnpj(self, cnpj):
         for empresa in self.__empresa_dao.get_all():
@@ -42,10 +83,12 @@ class ControladorEmpresaTransporte:
 
         try:
             cnpj_limpo = self.__limpa_numeros(dados.get("cnpj", ""))
+            
+            
             telefone_limpo = self.__limpa_numeros(dados.get("telefone", ""))
 
             if not self.__validar_cnpj(cnpj_limpo):
-                self.__tela.mostra_mensagem("❌ CNPJ inválido!")
+                self.__tela.mostra_mensagem("❌ CNPJ inválido! Verifique os dígitos.")
                 return
 
             if not self.__validar_telefone(telefone_limpo):
@@ -126,12 +169,12 @@ class ControladorEmpresaTransporte:
             if not empresa:
                 raise ElementoNaoExisteException("Empresa não encontrada.")
 
-            self.__controlador_controladores.controlador_meio_transporte.excluir_veiculos_da_empresa(
-                empresa)
+            
+            if hasattr(self.__controlador_controladores, 'controlador_meio_transporte'):
+                self.__controlador_controladores.controlador_meio_transporte.excluir_veiculos_da_empresa(empresa)
 
             self.__empresa_dao.remove(empresa.cnpj)
-            self.__tela.mostra_mensagem(
-                "Empresa e seus veículos removidos com sucesso!")
+            self.__tela.mostra_mensagem("Empresa excluída com sucesso!")
 
         except ElementoNaoExisteException as e:
             self.__tela.mostra_mensagem(str(e))

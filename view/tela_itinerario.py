@@ -23,8 +23,13 @@ class TelaItinerario:
         ]
         window = sg.Window("Menu Itinerário", layout, element_justification="center")
         
-        event, _ = window.read()
+        resultado = window.read()
         window.close()
+        
+        if resultado is None:
+            event = sg.WINDOW_CLOSED
+        else:
+            event = resultado[0]
         
         if event in (sg.WINDOW_CLOSED, "0 - Voltar ao Menu Principal"): return 0
         if event == "1 - Incluir Itinerário": return 1
@@ -44,19 +49,28 @@ class TelaItinerario:
         layout = [
             [sg.Text("🗺️ Cadastro de Itinerário", font=("Segoe UI", 14, "bold"))],
             [sg.HorizontalSeparator()],
-            [sg.Text("Código:", size=(15,1)), sg.Input(cod, key="codigo_itinerario", disabled=(itinerario is not None), size=(45, 1))],
-            [sg.Text("Origem:", size=(15,1)), sg.Input(orig, key="origem", size=(45, 1))],
-            [sg.Text("Destino:", size=(15,1)), sg.Input(dest, key="destino", size=(45, 1))],
-            [sg.Text("Data Início(dd/mm/aaaa)", size=(15,1)), sg.Input(d_ini, key="data_inicio", size=(45, 1))],
-            [sg.Text("Data Fim(dd/mm/aaaa)", size=(15,1)), sg.Input(d_fim, key="data_fim", size=(45, 1))],
+            # Ajustei o size=(25,1) nas datas para caber o texto todo
+            [sg.Text("Código:", size=(25,1)), sg.Input(cod, key="codigo_itinerario", disabled=(itinerario is not None), size=(35, 1))],
+            [sg.Text("Origem:", size=(25,1)), sg.Input(orig, key="origem", size=(35, 1))],
+            [sg.Text("Destino:", size=(25,1)), sg.Input(dest, key="destino", size=(35, 1))],
+            [sg.Text("Data Início (dd/mm/aaaa):", size=(25,1)), sg.Input(d_ini, key="data_inicio", size=(35, 1))],
+            [sg.Text("Data Fim (dd/mm/aaaa):", size=(25,1)), sg.Input(d_fim, key="data_fim", size=(35, 1))],
             [sg.HorizontalSeparator()],
             [sg.Button("💾 Confirmar", key="confirmar", size=(20, 1)), sg.Button("↩️ Cancelar", key="cancelar", size=(20, 1))]
         ]
+        
         window = sg.Window("Dados Itinerário", layout, element_justification="center")
-        event, values = window.read()
+        resultado = window.read()
         window.close()
         
-        if event == "confirmar":
+        # Proteção contra fechamento abrupto
+        if resultado is None:
+            event = sg.WINDOW_CLOSED
+            values = None
+        else:
+            event, values = resultado
+
+        if event == "confirmar" and values is not None:
             return {
                 "codigo_itinerario": values["codigo_itinerario"].strip(),
                 "origem": values["origem"].strip(),
@@ -66,7 +80,6 @@ class TelaItinerario:
             }
         return None
 
-    # --- MÉTODO 1: APENAS LISTAR (Botão Voltar) ---
     def mostra_itinerarios(self, dados_itinerario):
         if not dados_itinerario:
             sg.popup("Nenhum itinerário encontrado.", title="Aviso")
@@ -79,28 +92,22 @@ class TelaItinerario:
             [sg.Text("📋 Lista de Itinerários", font=("Segoe UI", 14, "bold"))],
             [sg.Table(values=rows, headings=headers, max_col_width=50, auto_size_columns=True, 
                     expand_x=True, expand_y=True, justification='center')],
-            [sg.Button("Voltar", size=(20, 1))] # Apenas voltar
+            [sg.Button("Voltar", size=(20, 1))]
         ]
         
         window = sg.Window("Itinerários", layout, size=(900, 400), element_justification="center")
         window.read()
         window.close()
 
-    # --- MÉTODO 2: SELECIONAR (Botões Confirmar/Cancelar) ---
     def seleciona_itinerario(self, dados_itinerario):
         if not dados_itinerario: 
             sg.popup("Lista vazia.", title="Aviso")
             return None
         
         headers = ["Código", "Origem", "Destino", "Início", "Fim"]
-        # Nota: Dependendo de quem chama, os nomes das chaves podem variar. 
-        # O controlador está mandando 'codigo_itinerario' no CRUD de Itinerário
-        # Mas 'codigo' no CRUD de Passagem. Vamos padronizar no controlador.
-        # Aqui assumimos o padrão do CRUD Itinerário: 'codigo_itinerario'
         
         rows = []
         for i in dados_itinerario:
-            # Tenta pegar 'codigo_itinerario', se não der tenta 'codigo' (fallback para compatibilidade)
             cod = i.get('codigo_itinerario', i.get('codigo', ''))
             orig = i.get('origem', '')
             dest = i.get('destino', '')
@@ -114,21 +121,31 @@ class TelaItinerario:
                     select_mode='browse', expand_x=True, expand_y=True, justification='center')],
             [sg.Button("Confirmar", size=(20, 1)), sg.Button("Cancelar", size=(20, 1))]
         ]
+        
         window = sg.Window("Seleção", layout, size=(900, 400), element_justification="center")
+        
         res = None
         while True:
-            e, v = window.read()
+            resultado = window.read()
+            if resultado is None: # Proteção
+                break
+            
+            e, v = resultado
+            
             if e in (sg.WINDOW_CLOSED, "Cancelar"): break
             if e == "Confirmar":
                 if v["tab"]:
-                    res = rows[v["tab"][0]][0] # Retorna o Código (coluna 0)
+                    res = rows[v["tab"][0]][0]
                     break
                 else:
                     sg.popup("Selecione uma linha.")
+        
         window.close()
         return res
 
     def confirmar_cadastro_passagem(self):
+        # popup_yes_no também é uma janela, mas o PySimpleGUI trata o fechamento dela internamente,
+        # então aqui geralmente é seguro.
         return sg.popup_yes_no("Itinerário criado! Deseja cadastrar passagens para ele agora?", title="Pergunta") == "Yes"
 
     def mostra_mensagem(self, msg):

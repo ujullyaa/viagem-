@@ -24,17 +24,27 @@ class TelaMeioTransporte:
         ]
         
         window = sg.Window("Meios de Transporte", layout, element_justification="center")
-        event, _ = window.read()
+
+        resultado = window.read()
         window.close()
+        
+        if resultado is None: 
+            return 0
+            
+        event, _ = resultado
 
         if event in (sg.WINDOW_CLOSED, "0 - Retornar"): return 0
-        if event == "1 - Incluir Meio de Transporte": return 1
-        if event == "2 - Alterar Meio de Transporte": return 2
-        if event == "3 - Listar Meios de Transporte": return 3
-        if event == "4 - Excluir Meio de Transporte": return 4
-        return 0
+        
+        opcoes = {
+            "1 - Incluir Meio de Transporte": 1, 
+            "2 - Alterar Meio de Transporte": 2, 
+            "3 - Listar Meios de Transporte": 3, 
+            "4 - Excluir Meio de Transporte": 4
+        }
+        return opcoes.get(event, 0)
 
     def pega_dados_meio_transporte(self, meio=None):
+
         tipo = meio.tipo if meio else ""
         cap = meio.capacidade if meio else ""
 
@@ -47,8 +57,12 @@ class TelaMeioTransporte:
             [sg.Button("💾 Confirmar", size=(20,1)), sg.Button("↩️ Cancelar", size=(20,1))]
         ]
         window = sg.Window("Cadastro Veículo", layout, element_justification="center")
-        event, values = window.read()
+        
+        resultado = window.read()
         window.close()
+
+        if resultado is None: return None
+        event, values = resultado
 
         if event == "💾 Confirmar":
             return {"tipo": values["-TIPO-"], "capacidade": values["-CAP-"]}
@@ -64,21 +78,23 @@ class TelaMeioTransporte:
         mapa_objetos = {} 
         
         for idx, m in enumerate(meios):
-            emp_nome = m.empresa_transporte.nome_empresa if m.empresa_transporte else "N/A"
+            
+            emp_nome = m.empresa_transporte.nome_empresa if hasattr(m, 'empresa_transporte') and m.empresa_transporte else "N/A"
+            
             rows.append([m.tipo, m.capacidade, emp_nome])
-            mapa_objetos[idx] = m
+            mapa_objetos[idx] = m 
 
         layout = [
             [sg.Text("Selecione o Veículo:", font=("Segoe UI", 14, "bold"))],
             [sg.Table(values=rows, headings=headers, 
-                      max_col_width=50, 
-                      auto_size_columns=True,
-                      justification='center', 
-                      key="tabela", 
-                      enable_events=True, 
-                      select_mode='browse', 
-                      expand_x=True, 
-                      expand_y=True)],
+                    max_col_width=50, 
+                    auto_size_columns=True,
+                    justification='center', 
+                    key="tabela", 
+                    enable_events=True, 
+                    select_mode='browse', 
+                    expand_x=True, 
+                    expand_y=True)],
             [sg.Button("Confirmar", size=(20,1)), sg.Button("Cancelar", size=(20,1))]
         ]
 
@@ -86,11 +102,18 @@ class TelaMeioTransporte:
         
         meio_selecionado = None
         while True:
-            event, values = window.read()
-            if event in (sg.WINDOW_CLOSED, "Cancelar"): break
+            resultado = window.read()
+            if resultado is None: break
+            
+            event, values = resultado
+            
+            if event in (sg.WINDOW_CLOSED, "Cancelar"): 
+                break
+            
             if event == "Confirmar":
                 if values["tabela"]:
                     idx_tabela = values["tabela"][0]
+                    
                     meio_selecionado = mapa_objetos[idx_tabela]
                     break
                 else:
@@ -105,19 +128,24 @@ class TelaMeioTransporte:
             return
         
         headers = ["Tipo", "Capacidade", "Empresa"]
-        rows = [[m.tipo, m.capacidade, (m.empresa_transporte.nome_empresa if m.empresa_transporte else "N/A")] for m in meios]
+        rows = []
+        for m in meios:
+            emp_nome = m.empresa_transporte.nome_empresa if hasattr(m, 'empresa_transporte') and m.empresa_transporte else "N/A"
+            rows.append([m.tipo, m.capacidade, emp_nome])
 
         layout = [
             [sg.Text("📋 Frota Cadastrada", font=("Segoe UI", 14, "bold"))],
             [sg.Table(values=rows, headings=headers, 
-                      max_col_width=50, 
-                      auto_size_columns=True,
-                      justification='center', 
-                      expand_x=True, 
-                      expand_y=True)],
+                    max_col_width=50, 
+                    auto_size_columns=True,
+                    justification='center', 
+                    expand_x=True, 
+                    expand_y=True)],
             [sg.Button("Voltar", size=(20,1))]
         ]
         window = sg.Window("Lista", layout, size=(800, 400), element_justification="center")
+        
+        
         window.read()
         window.close()
 
@@ -129,12 +157,12 @@ class TelaMeioTransporte:
         layout = [
             [sg.Text("Selecione a Empresa Proprietária:", font=("Segoe UI", 14, "bold"))],
             [sg.Table(values=rows, headings=headers, 
-                      auto_size_columns=True, 
-                      justification='center', 
-                      key="tab", 
-                      select_mode='browse', 
-                      expand_x=True, 
-                      expand_y=True)],
+                    auto_size_columns=True, 
+                    justification='center', 
+                    key="tab", 
+                    select_mode='browse', 
+                    expand_x=True, 
+                    expand_y=True)],
             [sg.Button("Confirmar", size=(20,1)), sg.Button("Cancelar", size=(20,1))]
         ]
         
@@ -142,8 +170,13 @@ class TelaMeioTransporte:
         empresa_obj = None
         
         while True:
-            ev, val = window.read()
+            resultado = window.read()
+            if resultado is None: break
+            
+            ev, val = resultado
+            
             if ev in (sg.WINDOW_CLOSED, "Cancelar"): break
+            
             if ev == "Confirmar":
                 if val["tab"]:
                     empresa_obj = mapa[val["tab"][0]]

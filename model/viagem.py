@@ -1,6 +1,5 @@
 import uuid
 
-
 class Viagem:
     def __init__(
         self,
@@ -37,13 +36,29 @@ class Viagem:
     def data_partida(self):
         return self.__data_partida
 
+    @data_partida.setter
+    def data_partida(self, nova_data):
+        self.__data_partida = nova_data
+
     @property
     def data_chegada(self):
         return self.__data_chegada
 
+    @data_chegada.setter
+    def data_chegada(self, nova_data):
+        self.__data_chegada = nova_data
+
     @property
     def status(self):
         return self.__status
+
+    @status.setter
+    def status(self, novo_status):
+        self.__status = novo_status
+
+    @property
+    def preco_base(self):
+        return self.__preco_base
 
     @property
     def passageiro(self):
@@ -52,18 +67,6 @@ class Viagem:
     @property
     def itinerario(self):
         return self.__itinerario
-
-    @data_partida.setter
-    def data_partida(self, nova_data):
-        self.__data_partida = nova_data
-
-    @data_chegada.setter
-    def data_chegada(self, nova_data):
-        self.__data_chegada = nova_data
-
-    @status.setter
-    def status(self, novo_status):
-        self.__status = novo_status
 
     @itinerario.setter
     def itinerario(self, novo_itinerario):

@@ -4,7 +4,6 @@ from daos.itinerario_dao import ItinerarioDAO
 from exceptions.elemento_nao_existe_exception import ElementoNaoExisteException
 from exceptions.elemento_repetido_exception import ElementoRepetidoException
 
-
 class ControladorItinerario:
     def __init__(self, controlador_controladores):
         self.__itinerario_dao = ItinerarioDAO()
@@ -41,19 +40,19 @@ class ControladorItinerario:
                 data_inicio=dados["data_inicio"],
                 data_fim=dados["data_fim"]
             )
-
-            if not itinerario.validar_datas():
+            
+            if hasattr(itinerario, 'validar_datas') and not itinerario.validar_datas():
                 self.__tela_itinerario.mostra_mensagem("Datas inválidas!")
                 return
 
             self.__itinerario_dao.add(itinerario)
 
             if self.__tela_itinerario.confirmar_cadastro_passagem():
-                self.__controlador_controladores.controlador_passagem.incluir_passagem(
-                    itinerario_fixo=itinerario)
+                if hasattr(self.__controlador_controladores, 'controlador_passagem'):
+                    self.__controlador_controladores.controlador_passagem.incluir_passagem(
+                        itinerario_fixo=itinerario)
             else:
-                self.__tela_itinerario.mostra_mensagem(
-                    "Itinerário cadastrado!")
+                self.__tela_itinerario.mostra_mensagem("Itinerário cadastrado!")
 
         except ElementoRepetidoException as e:
             self.__tela_itinerario.mostra_mensagem(str(e))
@@ -75,16 +74,14 @@ class ControladorItinerario:
                     "data_fim": i.data_fim
                 })
 
-            codigo = self.__tela_itinerario.seleciona_itinerario(
-                lista_itinerarios)
+            codigo = self.__tela_itinerario.seleciona_itinerario(lista_itinerarios)
             if not codigo:
                 return
 
             itinerario = self.pega_itinerario_por_codigo(codigo)
 
             if not itinerario:
-                raise ElementoNaoExisteException(
-                    "Itinerário não encontrado para alteração.")
+                raise ElementoNaoExisteException("Itinerário não encontrado para alteração.")
 
             dados = self.__tela_itinerario.pega_dados_itinerario(itinerario)
             if not dados:
@@ -95,7 +92,7 @@ class ControladorItinerario:
             itinerario.data_inicio = dados["data_inicio"]
             itinerario.data_fim = dados["data_fim"]
 
-            if not itinerario.validar_datas():
+            if hasattr(itinerario, 'validar_datas') and not itinerario.validar_datas():
                 self.__tela_itinerario.mostra_mensagem("Datas inválidas!")
                 return
 
@@ -122,8 +119,7 @@ class ControladorItinerario:
                     "data_fim": i.data_fim
                 })
 
-            codigo = self.__tela_itinerario.seleciona_itinerario(
-                lista_itinerarios)
+            codigo = self.__tela_itinerario.seleciona_itinerario(lista_itinerarios)
             if not codigo:
                 return
 
@@ -132,8 +128,22 @@ class ControladorItinerario:
             if not itinerario:
                 raise ElementoNaoExisteException("Itinerário não existe.")
 
+            
+            ctrl_passagem = getattr(self.__controlador_controladores, 'controlador_passagem', None)
+            
+            
+            if itinerario.passagens and ctrl_passagem:
+                qtd_removida = 0
+                
+                for passagem in itinerario.passagens[:]:
+                    ctrl_passagem.excluir_passagem_pelo_numero(passagem.numero)
+                    qtd_removida += 1
+                
+                print(f"Alerta: {qtd_removida} passagens vinculadas foram removidas.")
+
+
             self.__itinerario_dao.remove(itinerario.codigo_itinerario)
-            self.__tela_itinerario.mostra_mensagem("Removido!")
+            self.__tela_itinerario.mostra_mensagem("Itinerário e suas passagens foram removidos!")
 
         except ElementoNaoExisteException as e:
             self.__tela_itinerario.mostra_mensagem(str(e))
@@ -141,8 +151,7 @@ class ControladorItinerario:
     def listar_itinerarios(self):
         itins = self.__itinerario_dao.get_all()
         if not itins:
-            self.__tela_itinerario.mostra_mensagem(
-                "Nenhum itinerário cadastrado.")
+            self.__tela_itinerario.mostra_mensagem("Nenhum itinerário cadastrado.")
             return
 
         lista = []

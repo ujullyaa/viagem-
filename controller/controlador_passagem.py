@@ -1,11 +1,8 @@
 from view.tela_passagem import TelaPassagem
 from model.passagem import Passagem
-from model.pagamento import Cedula
 from daos.passagem_dao import PassagemDAO
-from datetime import datetime
 from exceptions.elemento_nao_existe_exception import ElementoNaoExisteException
 from exceptions.elemento_repetido_exception import ElementoRepetidoException
-
 
 class ControladorPassagem:
     def __init__(self, controlador_controladores, controlador_itinerario, controlador_pessoa, controlador_meio_transporte):
@@ -36,31 +33,37 @@ class ControladorPassagem:
             })
         return lista
 
+    def excluir_passagem_pelo_numero(self, numero):
+        passagem = self.pega_passagem_por_numero(numero)
+        if passagem:
+            self.__passagem_dao.remove(passagem.numero)
+
     def incluir_passagem(self, itinerario_fixo=None):
         try:
+
             dados = self.__tela_passagem.pega_dados_passagem()
             if not dados:
                 return
 
             numero = str(dados["numero"]).zfill(6)
-
             if self.pega_passagem_por_numero(numero):
-                raise ElementoRepetidoException(
-                    f"Passagem número {numero} já existe.")
+                raise ElementoRepetidoException(f"Passagem número {numero} já existe.")
+
 
             pessoa = self.__controlador_pessoa.escolher_pessoa_externo()
             if not pessoa:
                 return
 
-            tipo_meio = self.__tela_passagem.seleciona_meio_transporte()
-            if not tipo_meio:
+
+            meios_existentes = self.__controlador_meio_transporte.meios_transporte
+            if not meios_existentes:
+                self.__tela_passagem.mostra_mensagem("Não há veículos cadastrados.")
                 return
 
-            meio_transporte = self.__controlador_meio_transporte.pega_meio_por_tipo(
-                tipo_meio)
+            meio_transporte = self.__tela_passagem.seleciona_meio_transporte(meios_existentes)
             if not meio_transporte:
-                raise ElementoNaoExisteException(
-                    f"O meio de transporte '{tipo_meio}' não foi encontrado.")
+                return 
+
 
             itinerario = None
             if itinerario_fixo:
@@ -68,60 +71,79 @@ class ControladorPassagem:
             else:
                 lista_objs = self.__controlador_itinerario.itinerarios
                 dados_itinerarios = [{"codigo": it.codigo_itinerario, "origem": it.origem,
-                                    "destino": it.destino, "inicio": it.data_inicio} for it in lista_objs]
+                                        "destino": it.destino, "inicio": it.data_inicio} for it in lista_objs]
 
-                codigo_itinerario = self.__tela_passagem.seleciona_itinerario(
-                    dados_itinerarios)
+                codigo_itinerario = self.__tela_passagem.seleciona_itinerario(dados_itinerarios)
                 if not codigo_itinerario:
                     return
 
-                itinerario = self.__controlador_itinerario.pega_itinerario_por_codigo(
-                    codigo_itinerario)
+                itinerario = self.__controlador_itinerario.pega_itinerario_por_codigo(codigo_itinerario)
 
             if not itinerario:
                 raise ElementoNaoExisteException("Itinerário não encontrado.")
 
-            pagamento_confirmado = self.__tela_passagem.confirma_pagamento_visual(
-                dados["valor"], pessoa.nome)
-            if not pagamento_confirmado:
-                self.__tela_passagem.mostra_mensagem(
-                    "Pagamento pendente. Cadastro cancelado.")
+            if not hasattr(itinerario, 'passagens'):
+
+                self.__tela_passagem.mostra_mensagem("Erro interno: Itinerário sem lista de passagens.")
                 return
 
-            novo_pagamento = Cedula(
-                forma_pagamento="Dinheiro",
-                pagou=True,
-                data=datetime.now().strftime("%d/%m/%Y"),
-                valor_total=float(dados["valor"]),
-                passageiro=pessoa
-            )
+            quantidade_vendida = len(itinerario.passagens)
+            capacidade_veiculo = int(meio_transporte.capacidade)
+
+            if quantidade_vendida >= capacidade_veiculo:
+                self.__tela_passagem.mostra_mensagem(
+                    f"❌ Erro: Capacidade Esgotada!\n"
+                    f"Veículo suporta: {capacidade_veiculo}\n"
+                    f"Passagens vendidas: {quantidade_vendida}"
+                )
+                return
+
+
+            if not self.__tela_passagem.confirma_pagamento_visual(dados["valor"], pessoa.nome):
+                return
+
+            controlador_pag = getattr(self.__controlador_controladores, 'controlador_pagamento', None)
+            if not controlador_pag:
+                self.__tela_passagem.mostra_mensagem("Erro: Módulo de Pagamento não encontrado.")
+                return
+
+            valor_float = float(dados["valor"])
+            
+
+            pagamento_realizado = controlador_pag.cobrar_pagamento(valor_float, pessoa)
+
+            if not pagamento_realizado or not pagamento_realizado.pagou:
+                self.__tela_passagem.mostra_mensagem("Pagamento não confirmado. Venda cancelada.")
+                return
+
 
             passagem = Passagem(numero, dados["assento"], dados["data_viagem"],
-                                dados["valor"], pessoa, novo_pagamento, meio_transporte)
+                                dados["valor"], pessoa, pagamento_realizado, meio_transporte)
+
 
             self.__passagem_dao.add(passagem)
+            
+
             itinerario.passagens.append(passagem)
             self.__controlador_itinerario.atualizar_itinerario(itinerario)
 
-            self.__tela_passagem.mostra_mensagem(
-                f"Passagem nº {numero} emitida com sucesso!")
+            self.__tela_passagem.mostra_mensagem(f"✅ Passagem nº {numero} emitida com sucesso!")
 
         except (ElementoRepetidoException, ElementoNaoExisteException) as e:
             self.__tela_passagem.mostra_mensagem(str(e))
         except ValueError:
-            self.__tela_passagem.mostra_mensagem(
-                "Erro: Valor deve ser numérico.")
+            self.__tela_passagem.mostra_mensagem("Erro: Valor deve ser numérico.")
+        except Exception as e:
+            self.__tela_passagem.mostra_mensagem(f"Erro inesperado: {str(e)}")
 
     def alterar_passagem(self):
         try:
             lista_dados = self.__monta_lista_passagens()
             if not lista_dados:
-                self.__tela_passagem.mostra_mensagem(
-                    "Nenhuma passagem cadastrada.")
+                self.__tela_passagem.mostra_mensagem("Nenhuma passagem cadastrada.")
                 return
 
-            numero = self.__tela_passagem.seleciona_passagem_por_lista(
-                lista_dados)
+            numero = self.__tela_passagem.seleciona_passagem_por_lista(lista_dados)
             if not numero:
                 return
 
@@ -138,8 +160,7 @@ class ControladorPassagem:
             passagem.valor = novos_dados["valor"]
 
             self.__passagem_dao.update(passagem)
-            self.__tela_passagem.mostra_mensagem(
-                "Passagem alterada com sucesso!")
+            self.__tela_passagem.mostra_mensagem("Passagem alterada com sucesso!")
 
         except ElementoNaoExisteException as e:
             self.__tela_passagem.mostra_mensagem(str(e))
@@ -148,12 +169,10 @@ class ControladorPassagem:
         try:
             lista_dados = self.__monta_lista_passagens()
             if not lista_dados:
-                self.__tela_passagem.mostra_mensagem(
-                    "Nenhuma passagem cadastrada.")
+                self.__tela_passagem.mostra_mensagem("Nenhuma passagem cadastrada.")
                 return
 
-            numero = self.__tela_passagem.seleciona_passagem_por_lista(
-                lista_dados)
+            numero = self.__tela_passagem.seleciona_passagem_por_lista(lista_dados)
             if not numero:
                 return
 
@@ -162,8 +181,7 @@ class ControladorPassagem:
                 raise ElementoNaoExisteException("Passagem não encontrada.")
 
             self.__passagem_dao.remove(passagem.numero)
-            self.__tela_passagem.mostra_mensagem(
-                "Passagem excluída com sucesso!")
+            self.__tela_passagem.mostra_mensagem("Passagem excluída com sucesso!")
 
         except ElementoNaoExisteException as e:
             self.__tela_passagem.mostra_mensagem(str(e))
@@ -171,8 +189,7 @@ class ControladorPassagem:
     def listar_passagens(self):
         passagens = self.__passagem_dao.get_all()
         if not passagens:
-            self.__tela_passagem.mostra_mensagem(
-                "Nenhuma passagem cadastrada.")
+            self.__tela_passagem.mostra_mensagem("Nenhuma passagem cadastrada.")
             return
 
         for p in passagens:
@@ -180,13 +197,19 @@ class ControladorPassagem:
             if p.pagamento and hasattr(p.pagamento, 'pagou') and p.pagamento.pagou:
                 status_pag = "Pago"
 
+            meio_str = "Desconhecido"
+            if p.meio_transporte:
+                tipo = getattr(p.meio_transporte, 'tipo', 'N/A')
+                cap = getattr(p.meio_transporte, 'capacidade', 'N/A')
+                meio_str = f"{tipo} (Cap: {cap})"
+
             self.__tela_passagem.mostra_passagem({
                 "numero": p.numero,
                 "assento": p.assento,
                 "data_viagem": p.data_viagem,
                 "valor": p.valor,
-                "pessoa": p.pessoa.nome,
-                "meio_transporte": p.meio_transporte.tipo,
+                "pessoa": p.pessoa.nome if p.pessoa else "Desconhecido",
+                "meio_transporte": meio_str,
                 "status_pagamento": status_pag
             })
 
@@ -201,14 +224,12 @@ class ControladorPassagem:
             4: self.excluir_passagem,
             0: self.retornar
         }
-
         while True:
             escolha = self.__tela_passagem.tela_opcoes()
-            funcao = opcoes.get(escolha)
-
             if escolha == 0:
                 break
-            elif funcao:
+            funcao = opcoes.get(escolha)
+            if funcao:
                 funcao()
             else:
                 self.__tela_passagem.mostra_mensagem("Opção inválida!")

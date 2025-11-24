@@ -13,7 +13,16 @@ class ControladorPessoa:
     def __validar_cpf(self, cpf):
         cpf = ''.join(filter(str.isdigit, str(cpf)))
         if len(cpf) != 11: return False
-        return True
+        
+        if cpf == cpf[0] * 11: return False
+
+        soma = sum(int(cpf[i]) * (10 - i) for i in range(9))
+        digito_1 = (soma * 10 % 11) % 10
+        
+        soma = sum(int(cpf[i]) * (11 - i) for i in range(10))
+        digito_2 = (soma * 10 % 11) % 10
+
+        return cpf[-2:] == f"{digito_1}{digito_2}"
     
     def __validar_telefone(self, telefone):
         tel = ''.join(filter(str.isdigit, str(telefone)))
@@ -28,10 +37,10 @@ class ControladorPessoa:
         except ValueError:
             return False, "A idade deve ser um número inteiro válido."
 
+
     def pega_pessoa_por_cpf(self, cpf):
-        for p in self.__pessoa_dao.get_all():
-            if p.cpf == cpf: return p
-        return None
+        
+        return self.__pessoa_dao.get(cpf)
     
     def __monta_lista_dados(self):
         return [{"nome": p.nome, "idade": p.idade, "cpf": p.cpf, "telefone": p.telefone} for p in self.__pessoa_dao.get_all()]
@@ -143,7 +152,7 @@ class ControladorPessoa:
             funcao = opcoes.get(opcao)
             
             if opcao == 0:
-                funcao()
+                funcao() # type: ignore
                 break
             elif funcao:
                 funcao()
