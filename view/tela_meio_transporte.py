@@ -16,17 +16,19 @@ class TelaMeioTransporte:
                     [sg.Button("3 - Listar Meios de Transporte", size=(35, 1))],
                     [sg.Button("4 - Excluir Meio de Transporte", size=(35, 1))],
                     [sg.HorizontalSeparator()],
-                    [sg.Button("0 - Voltar ao Menu Principal", button_color=("white", "red"), size=(35, 1))]
+                    [sg.Button("0 - Retornar", button_color=("white", "red"), size=(35, 1))]
                 ],
                 element_justification="center",
                 expand_x=True
             )]
         ]
+        
+        # Janela ajustada ao conteúdo (sem size fixo grande para não ficar espaço vazio)
         window = sg.Window("Meios de Transporte", layout, element_justification="center")
         event, _ = window.read()
         window.close()
 
-        if event in (sg.WINDOW_CLOSED, "0 - Voltar ao Menu Principal"): return 0
+        if event in (sg.WINDOW_CLOSED, "0 - Retornar"): return 0
         if event == "1 - Incluir Meio de Transporte": return 1
         if event == "2 - Alterar Meio de Transporte": return 2
         if event == "3 - Listar Meios de Transporte": return 3
@@ -39,6 +41,7 @@ class TelaMeioTransporte:
 
         layout = [
             [sg.Text("🚍 Dados do Veículo", font=("Segoe UI", 14, "bold"))],
+            [sg.HorizontalSeparator()],
             [sg.Text("Tipo:", size=(15,1)), sg.Combo(self._tipos_fixos, default_value=tipo, size=(43,1), key="-TIPO-", readonly=True)],
             [sg.Text("Capacidade:", size=(15,1)), sg.Input(str(cap), size=(45,1), key="-CAP-")],
             [sg.HorizontalSeparator()],
@@ -53,11 +56,12 @@ class TelaMeioTransporte:
         return None
 
     def seleciona_meio_transporte(self, meios):
-        # Se a lista estiver vazia, o controlador avisa.
-        # Aqui vamos usar TABELA para selecionar (muito melhor que combo)
+        if not meios:
+            sg.popup("Nenhum meio cadastrado.", title="Aviso")
+            return None
+
         headers = ["Tipo", "Capacidade", "Empresa"]
         rows = []
-        # Mapeamento para retornar o OBJETO correto, pois não temos ID simples aqui
         mapa_objetos = {} 
         
         for idx, m in enumerate(meios):
@@ -67,9 +71,16 @@ class TelaMeioTransporte:
 
         layout = [
             [sg.Text("Selecione o Veículo:", font=("Segoe UI", 14, "bold"))],
-            [sg.Table(values=rows, headings=headers, max_col_width=50, auto_size_columns=True,
-                    justification='center', key="tabela", enable_events=True, select_mode='browse', 
-                    expand_x=True, expand_y=True)],
+            # Tabela Centralizada e Expandida
+            [sg.Table(values=rows, headings=headers, 
+                      max_col_width=50, 
+                      auto_size_columns=True,
+                      justification='center', # Centraliza o texto nas colunas
+                      key="tabela", 
+                      enable_events=True, 
+                      select_mode='browse', 
+                      expand_x=True, 
+                      expand_y=True)],
             [sg.Button("Confirmar", size=(20,1)), sg.Button("Cancelar", size=(20,1))]
         ]
 
@@ -85,15 +96,14 @@ class TelaMeioTransporte:
                     meio_selecionado = mapa_objetos[idx_tabela]
                     break
                 else:
-                    sg.popup("Selecione uma linha!")
+                    sg.popup("Selecione uma linha!", title="Aviso")
         
         window.close()
         return meio_selecionado
 
     def lista_meios(self, meios):
-        # Reutiliza a lógica de tabela, mas sem retornar seleção
         if not meios:
-            sg.popup("Nenhum meio cadastrado.")
+            sg.popup("Nenhum meio cadastrado.", title="Aviso")
             return
         
         headers = ["Tipo", "Capacidade", "Empresa"]
@@ -101,8 +111,12 @@ class TelaMeioTransporte:
 
         layout = [
             [sg.Text("📋 Frota Cadastrada", font=("Segoe UI", 14, "bold"))],
-            [sg.Table(values=rows, headings=headers, max_col_width=50, auto_size_columns=True,
-                    justification='center', expand_x=True, expand_y=True)],
+            [sg.Table(values=rows, headings=headers, 
+                      max_col_width=50, 
+                      auto_size_columns=True,
+                      justification='center', 
+                      expand_x=True, 
+                      expand_y=True)],
             [sg.Button("Voltar", size=(20,1))]
         ]
         window = sg.Window("Lista", layout, size=(800, 400), element_justification="center")
@@ -110,17 +124,25 @@ class TelaMeioTransporte:
         window.close()
 
     def seleciona_empresa(self, empresas):
-        # Transforma em Tabela também para padronizar
         headers = ["Nome", "CNPJ"]
         rows = [[e.nome_empresa, e.cnpj] for e in empresas]
         mapa = {idx: e for idx, e in enumerate(empresas)}
 
         layout = [
-            [sg.Text("Selecione a Empresa Proprietária:", font=("Segoe UI", 14))],
-            [sg.Table(values=rows, headings=headers, auto_size_columns=True, key="tab", select_mode='browse', expand_x=True, expand_y=True)],
-            [sg.Button("Confirmar"), sg.Button("Cancelar")]
+            [sg.Text("Selecione a Empresa Proprietária:", font=("Segoe UI", 14, "bold"))],
+            # Tabela Centralizada
+            [sg.Table(values=rows, headings=headers, 
+                      auto_size_columns=True, 
+                      justification='center', # Texto centralizado
+                      key="tab", 
+                      select_mode='browse', 
+                      expand_x=True, 
+                      expand_y=True)],
+            [sg.Button("Confirmar", size=(20,1)), sg.Button("Cancelar", size=(20,1))]
         ]
-        window = sg.Window("Seleção Empresa", layout, size=(600, 300))
+        
+        # Janela centralizada e com tamanho razoável
+        window = sg.Window("Seleção Empresa", layout, size=(700, 400), element_justification="center")
         empresa_obj = None
         
         while True:
@@ -130,6 +152,8 @@ class TelaMeioTransporte:
                 if val["tab"]:
                     empresa_obj = mapa[val["tab"][0]]
                     break
+                else:
+                    sg.popup("Selecione uma empresa.", title="Aviso")
         window.close()
         return empresa_obj
 

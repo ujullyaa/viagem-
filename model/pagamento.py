@@ -77,7 +77,7 @@ class Cartao(Pagamento):
             print("❌ Pagamento no cartão não concluído.")
 class Pix(Pagamento):
     def __init__(self, forma_pagamento: str, pagou: bool, data: str, valor_total: float, passageiro,
-                 chave_pix: str, banco: str):
+                chave_pix: str, banco: str):
         super().__init__(forma_pagamento, pagou, data, valor_total, passageiro)
         self.__chave_pix = chave_pix
         self.__banco = banco
