@@ -23,7 +23,6 @@ class TelaMeioTransporte:
             )]
         ]
         
-        # Janela ajustada ao conteúdo (sem size fixo grande para não ficar espaço vazio)
         window = sg.Window("Meios de Transporte", layout, element_justification="center")
         event, _ = window.read()
         window.close()
@@ -71,11 +70,10 @@ class TelaMeioTransporte:
 
         layout = [
             [sg.Text("Selecione o Veículo:", font=("Segoe UI", 14, "bold"))],
-            # Tabela Centralizada e Expandida
             [sg.Table(values=rows, headings=headers, 
                       max_col_width=50, 
                       auto_size_columns=True,
-                      justification='center', # Centraliza o texto nas colunas
+                      justification='center', 
                       key="tabela", 
                       enable_events=True, 
                       select_mode='browse', 
@@ -130,10 +128,9 @@ class TelaMeioTransporte:
 
         layout = [
             [sg.Text("Selecione a Empresa Proprietária:", font=("Segoe UI", 14, "bold"))],
-            # Tabela Centralizada
             [sg.Table(values=rows, headings=headers, 
                       auto_size_columns=True, 
-                      justification='center', # Texto centralizado
+                      justification='center', 
                       key="tab", 
                       select_mode='browse', 
                       expand_x=True, 
@@ -141,7 +138,6 @@ class TelaMeioTransporte:
             [sg.Button("Confirmar", size=(20,1)), sg.Button("Cancelar", size=(20,1))]
         ]
         
-        # Janela centralizada e com tamanho razoável
         window = sg.Window("Seleção Empresa", layout, size=(700, 400), element_justification="center")
         empresa_obj = None
         

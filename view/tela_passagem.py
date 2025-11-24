@@ -33,7 +33,6 @@ class TelaPassagem:
         return -1
 
     def pega_dados_passagem(self, passagem=None):
-        # Valores padrão para alteração
         val_num = passagem.numero if passagem else ""
         val_assento = passagem.assento if passagem else ""
         val_data = passagem.data_viagem if passagem else ""
@@ -42,7 +41,6 @@ class TelaPassagem:
         layout = [
             [sg.Text("🎫 Dados da Passagem", font=("Segoe UI", 14, "bold"))],
             [sg.HorizontalSeparator()],
-            # Número desabilitado se for edição (chave primária)
             [sg.Text("Número:", size=(15,1)), sg.Input(val_num, key="numero", size=(45,1), disabled=(passagem is not None))],
             [sg.Text("Assento:", size=(15,1)), sg.Input(val_assento, key="assento", size=(45,1))],
             [sg.Text("Data:", size=(15,1)), sg.Input(val_data, key="data_viagem", size=(45,1))],
@@ -79,12 +77,8 @@ class TelaPassagem:
     def mostra_mensagem(self, msg):
         sg.popup(msg, title="Mensagem", font=("Segoe UI", 11))
 
-    # --- MÉTODOS DE SELEÇÃO VISUAL ---
 
     def seleciona_passagem_por_lista(self, dados_passagens):
-        """
-        Exibe uma tabela com as passagens e retorna o NÚMERO da passagem selecionada.
-        """
         if not dados_passagens:
             sg.popup("Nenhuma passagem para selecionar.", title="Aviso")
             return None
@@ -109,7 +103,7 @@ class TelaPassagem:
             if event == "Confirmar":
                 if values["tab"]:
                     idx = values["tab"][0]
-                    numero_selecionado = rows[idx][0] # Número é a primeira coluna
+                    numero_selecionado = rows[idx][0] 
                     break
                 else:
                     sg.popup("Selecione uma linha!", title="Aviso")

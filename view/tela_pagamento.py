@@ -60,7 +60,6 @@ class TelaPagamento:
             [sg.Button("Confirmar", size=(20,1)), sg.Button("Cancelar", size=(20,1))]
         ]
 
-        # Aqui também removi tamanho fixo para ficar ajustado
         window = sg.Window("Dados Pagamento", layout, element_justification="center")
         event, values = window.read()
         window.close()
@@ -115,13 +114,11 @@ class TelaPagamento:
 
         layout = [
             [sg.Text("📋 Lista de Pagamentos", font=("Segoe UI", 14, "bold"))],
-            # Tabela ajustada
             [sg.Table(values=rows, headings=headers, max_col_width=50, auto_size_columns=True,
                     justification='center', expand_x=True, expand_y=True)],
             [sg.Button("Voltar", size=(20,1))]
         ]
-        # Aqui mantive um tamanho fixo razoável (900x400) APENAS para a lista, 
-        # pois tabelas precisam de espaço. Se quiser compactar, tire o size.
+
         window = sg.Window("Lista Pagamentos", layout, size=(900, 400), element_justification="center")
         window.read()
         window.close()

@@ -68,7 +68,6 @@ class TelaPessoa:
             }
         return None
 
-    # --- Apenas Lista (Botão Voltar) ---
     def mostra_pessoas(self, dados_pessoas):
         if not dados_pessoas:
             sg.popup("Nenhuma pessoa cadastrada.", title="Aviso")
@@ -90,14 +89,12 @@ class TelaPessoa:
         window.read()
         window.close()
 
-    # --- NOVA FUNÇÃO: Lista selecionável (Botões Confirmar/Cancelar) ---
     def seleciona_pessoa_por_lista(self, dados_pessoas):
         if not dados_pessoas:
             sg.popup("Nenhuma pessoa cadastrada para selecionar.", title="Aviso")
             return None
 
         headers = ["CPF", "Nome", "Idade", "Telefone"]
-        # Cria lista de listas para a tabela
         rows = [[p['cpf'], p['nome'], p['idade'], p['telefone']] for p in dados_pessoas]
 
         layout = [
@@ -121,11 +118,9 @@ class TelaPessoa:
                 break
 
             if event == "Confirmar":
-                # Verifica qual linha está selecionada (retorna uma lista de índices, ex: [0])
                 selected_rows = values.get("tabela_pessoas")
                 if selected_rows:
                     index = selected_rows[0]
-                    # O CPF é a primeira coluna (índice 0) da linha selecionada
                     cpf_selecionado = rows[index][0]
                     break
                 else:

@@ -1,7 +1,6 @@
 from model.pessoa import Pessoa
 from view.tela_pessoa import TelaPessoa
 from daos.pessoa_dao import PessoaDAO
-# --- IMPORTS DAS EXCEPTIONS ---
 from exceptions.elemento_nao_existe_exception import ElementoNaoExisteException
 from exceptions.elemento_repetido_exception import ElementoRepetidoException
 
@@ -11,7 +10,6 @@ class ControladorPessoa:
         self.__tela_pessoa = TelaPessoa()
         self.__controlador_controladores = controlador_controladores
 
-    # --- Validadores ---
     def __validar_cpf(self, cpf):
         cpf = ''.join(filter(str.isdigit, str(cpf)))
         if len(cpf) != 11: return False
@@ -21,18 +19,15 @@ class ControladorPessoa:
         tel = ''.join(filter(str.isdigit, str(telefone)))
         return 10 <= len(tel) <= 11
 
-    # --- CORREÇÃO AQUI: VALIDAÇÃO DE IDADE >= 18 ---
     def __validar_idade(self, idade):
         try:
             i = int(idade)
             if i < 18:
-                # Retorna False e a mensagem específica solicitada
                 return False, "Pessoa menor de idade. Cadastro não permitido."
             return True, i
         except ValueError:
             return False, "A idade deve ser um número inteiro válido."
 
-    # --- Helpers ---
     def pega_pessoa_por_cpf(self, cpf):
         for p in self.__pessoa_dao.get_all():
             if p.cpf == cpf: return p
@@ -41,7 +36,6 @@ class ControladorPessoa:
     def __monta_lista_dados(self):
         return [{"nome": p.nome, "idade": p.idade, "cpf": p.cpf, "telefone": p.telefone} for p in self.__pessoa_dao.get_all()]
 
-    # --- MÉTODOS PRINCIPAIS ---
 
     def incluir_pessoa(self):
         dados = self.__tela_pessoa.pega_dados_pessoa()
@@ -50,7 +44,6 @@ class ControladorPessoa:
         try:
             cpf_limpo = ''.join(filter(str.isdigit, dados["cpf"]))
             
-            # EXCEPTION: Elemento Repetido
             if self.pega_pessoa_por_cpf(cpf_limpo):
                 raise ElementoRepetidoException(f"Já existe uma pessoa com o CPF {cpf_limpo}")
 
@@ -58,13 +51,11 @@ class ControladorPessoa:
                 self.__tela_pessoa.mostra_mensagem("CPF inválido.")
                 return
 
-            # Valida Idade (Agora barra menores de 18)
             valido_idade, res_idade = self.__validar_idade(dados["idade"])
             if not valido_idade:
                 self.__tela_pessoa.mostra_mensagem(f"Erro: {res_idade}")
                 return
 
-            # Valida Telefone
             if not self.__validar_telefone(dados["telefone"]):
                 self.__tela_pessoa.mostra_mensagem("Telefone inválido.")
                 return
@@ -84,14 +75,12 @@ class ControladorPessoa:
 
             pessoa = self.pega_pessoa_por_cpf(cpf_selecionado)
             
-            # EXCEPTION: Elemento Não Existe
             if not pessoa:
                 raise ElementoNaoExisteException("Pessoa não encontrada no sistema.")
 
             novos_dados = self.__tela_pessoa.pega_dados_pessoa(pessoa_existente=pessoa)
             if not novos_dados: return
 
-            # Valida Idade na alteração também
             valido_idade, res_idade = self.__validar_idade(novos_dados["idade"])
             if not valido_idade:
                 self.__tela_pessoa.mostra_mensagem(f"Erro: {res_idade}")
@@ -119,7 +108,6 @@ class ControladorPessoa:
 
             pessoa = self.pega_pessoa_por_cpf(cpf_selecionado)
             
-            # EXCEPTION: Elemento Não Existe
             if not pessoa:
                 raise ElementoNaoExisteException("Pessoa não encontrada para exclusão.")
 
@@ -140,7 +128,6 @@ class ControladorPessoa:
         return self.pega_pessoa_por_cpf(cpf)
 
     def retornar(self):
-        # Apenas return vazio para encerrar o loop e voltar ao menu anterior
         return
 
     def abre_tela(self):
