@@ -56,7 +56,6 @@ class TelaEmpresaTransporte:
             return {"nome": values["nome"], "cnpj": values["cnpj"], "telefone": values["telefone"]}
         return None
 
-    # --- MÉTODO 1: APENAS LISTAR (CORRIGIDO O BOTÃO VOLTAR) ---
     def mostra_empresas(self, empresas):
         if not empresas:
             sg.popup("Nenhuma empresa encontrada.", title="Aviso")
@@ -69,14 +68,13 @@ class TelaEmpresaTransporte:
             [sg.Text("📋 Lista de Empresas", font=("Segoe UI", 14, "bold"))],
             [sg.Table(values=rows, headings=headers, max_col_width=50, auto_size_columns=True,
                       justification='center', key="tabela", expand_x=True, expand_y=True)],
-            [sg.Button("Voltar", size=(20, 1))] # Botão correto
+            [sg.Button("Voltar", size=(20, 1))] 
         ]
 
         window = sg.Window("Lista", layout, size=(800, 400), element_justification="center")
-        window.read() # Espera o clique
-        window.close() # Fecha ao clicar em Voltar ou X
+        window.read() 
+        window.close() 
 
-    # --- MÉTODO 2: SELECIONAR (PARA ALTERAR/EXCLUIR) ---
     def seleciona_empresa(self, empresas):
         if not empresas:
             sg.popup("Nenhuma empresa encontrada.", title="Aviso")
@@ -103,7 +101,7 @@ class TelaEmpresaTransporte:
             if event == "Confirmar":
                 if values["tabela"]:
                     idx = values["tabela"][0]
-                    selected_cnpj = rows[idx][0] # CNPJ é a primeira coluna
+                    selected_cnpj = rows[idx][0] 
                     break
                 else:
                     sg.popup("Selecione uma linha!", title="Aviso")

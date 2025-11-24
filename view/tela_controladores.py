@@ -24,7 +24,6 @@ class TelaControladores:
                 window.close()
                 return 0
 
-            # Retorna número da opção escolhida
             for i in range(1, 8):
                 if event.startswith(f"{i} -"):
                     window.close()

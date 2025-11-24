@@ -51,7 +51,7 @@ class ControladorPagamento:
             pagou = dados_pagamento["pagou"]
 
             pagamento = None
-            msg_sucesso = "Pagamento cadastrado com sucesso!" # Mensagem de sucesso padrão
+            msg_sucesso = "Pagamento cadastrado com sucesso!"
 
             if forma_pagamento == "cartao":
                 dados_cartao = self.__tela_pagamento.pega_dados_cartao()
@@ -69,7 +69,6 @@ class ControladorPagamento:
                 pagamento = Pix("pix", pagou, data, valor_total, passageiro,
                                  dados_pix["chave_pix"], dados_pix["banco"])
                 
-                # Usa a informação do banco para a mensagem, como na sua ideia original
                 msg_sucesso = f"⚡ Pagamento via PIX ({dados_pix['banco']}) realizado com sucesso."
 
             elif forma_pagamento == "cedulas":
@@ -84,16 +83,13 @@ class ControladorPagamento:
             pagamento.processar_pagamento()
             self.__pagamento_dao.add(pagamento)
             
-            # Chama a função de GUI com a mensagem de sucesso dinâmica
             self.__tela_pagamento.mostra_mensagem(msg_sucesso)
 
         except ElementoNaoExisteException as e:
             self.__tela_pagamento.mostra_mensagem(str(e))
         except ValueError:
-            # Mensagem mais clara para o erro de conversão numérica
             self.__tela_pagamento.mostra_mensagem("Erro: Valor inválido! Verifique se o 'Valor Total' contém apenas números.")
 
-    # --- MÉTODO ALTERAR ---
     def alterar_pagamento(self):
         try:
             lista_dados = self.__monta_lista_dados()
@@ -114,8 +110,6 @@ class ControladorPagamento:
             if not novos_dados:
                 return
 
-            # Note: A lógica para alterar detalhes específicos de Cartao/Pix não está aqui,
-            # mas os dados principais são atualizados corretamente abaixo.
             pagamento.valor_total = float(novos_dados["valor_total"])
             pagamento.data = novos_dados["data"]
             pagamento.pagou = novos_dados["pagou"]

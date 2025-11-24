@@ -11,10 +11,7 @@ class ControladorViagem:
         self.__dao = ViagemDAO()
         self.__tela = TelaViagem()
         self.__pessoa_dao = PessoaDAO()
-        # Inicialização das DAOs de relacionamento (Itinerario, MeioTransporte, etc.)
-        # ...
 
-    # ---------- LOOP PRINCIPAL ----------
     def abre_tela(self):
         opcoes = {
             1: self.cadastrar_viagem,
@@ -23,15 +20,13 @@ class ControladorViagem:
             4: self.cancelar_passagem,
             5: self.atualizar_status,
 
-            # 🚨 CORREÇÃO ESSENCIAL: CHAVES INVERTIDAS
-            6: self.alterar_viagem,  # 6 - Alterar Viagem chama ALTERAR
-            7: self.excluir_viagem  # 7 - Excluir Viagem chama EXCLUIR
+            6: self.alterar_viagem,  
+            7: self.excluir_viagem  
         }
 
         while True:
             opcao = self.__tela.tela_opcoes()
 
-            # 🛑 FECHAMENTO: Trata 'X' na janela (sg.WIN_CLOSED) e '0 - Voltar ao Menu'
             if opcao == sg.WIN_CLOSED or opcao == 0:
                 break
 
@@ -47,7 +42,6 @@ class ControladorViagem:
     def retornar_menu(self):
         self.__controlador_sistema.inicializa_sistema()
 
-    # --- CADASTRAR VIAGEM (Mantido) ---
     def cadastrar_viagem(self):
         dados = self.__tela.pega_dados_viagem()
         if not dados:
@@ -58,7 +52,6 @@ class ControladorViagem:
             self.__tela.mostra_mensagem("❌ Passageiro (CPF) não encontrado.")
             return
 
-        # Busca dos objetos de relacionamento (Itinerario, Meio, Empresa) - placeholders por enquanto
         itinerario = None
         meio_transporte = None
         empresa_transporte = None
@@ -72,7 +65,6 @@ class ControladorViagem:
         self.__dao.add(nova)
         self.__tela.mostra_mensagem("✔️ Viagem cadastrada com sucesso!")
 
-    # --- LISTAR VIAGENS (Mantido) ---
     def listar_viagens(self):
         viagens = self.__dao.get_all()
         dados = []
@@ -83,7 +75,6 @@ class ControladorViagem:
             })
         self.__tela.mostra_viagens(dados)
 
-    # --- RESERVAR VIAGEM (Mantido) ---
     def reservar_viagem(self):
         codigo = self.__tela.seleciona_viagem()
         if not codigo:
@@ -102,7 +93,6 @@ class ControladorViagem:
             f"✔️ Passagem reservada!\nCódigo: {passagem['codigo']}\nAssento: {assento}"
         )
 
-    # --- CANCELAR PASSAGEM (Mantido) ---
     def cancelar_passagem(self):
         codigo = self.__tela.seleciona_viagem()
         if not codigo:
@@ -128,7 +118,6 @@ class ControladorViagem:
         else:
             self.__tela.mostra_mensagem("❌ Código da passagem não encontrado.")
 
-    # --- ATUALIZAR STATUS (Mantido) ---
     def atualizar_status(self):
         codigo = self.__tela.seleciona_viagem()
         if not codigo:
@@ -148,7 +137,6 @@ class ControladorViagem:
         else:
             self.__tela.mostra_mensagem("❌ Atualização de status cancelada.")
 
-    # --- ALTERAR VIAGEM (Mantido) ---
     def alterar_viagem(self):
         codigo = self.__tela.seleciona_viagem()
         if not codigo:
@@ -178,7 +166,6 @@ class ControladorViagem:
         self.__dao.update(viagem)
         self.__tela.mostra_mensagem("✔️ Viagem alterada com sucesso!")
 
-    # --- EXCLUIR VIAGEM (Mantido) ---
     def excluir_viagem(self):
         codigo = self.__tela.seleciona_viagem()
         if not codigo:
