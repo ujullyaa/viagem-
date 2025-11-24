@@ -21,7 +21,7 @@ class TelaPassagem:
                 expand_x=True
             )]
         ]
-        window = sg.Window("Menu Passagens", layout, element_justification="center", size=(600, 500))
+        window = sg.Window("Menu Passagens", layout, element_justification="center")
         event, _ = window.read()
         window.close()
 

@@ -21,7 +21,9 @@ class TelaPagamento:
                 expand_x=True
             )]
         ]
-        window = sg.Window("Menu Pagamento", layout, element_justification="center", size=(600, 500))
+        
+        window = sg.Window("Menu Pagamento", layout, element_justification="center")
+        
         event, _ = window.read()
         window.close()
 
@@ -36,16 +38,14 @@ class TelaPagamento:
         return opcoes.get(event, 0)
 
     def pega_dados_pagamento(self, pagamento=None):
-        # Define valores padrão (vazios se for inclusão, preenchidos se for alteração)
+        # Valores padrão
         val_cpf = pagamento.passageiro.cpf if pagamento else ""
         val_total = str(pagamento.valor_total) if pagamento else ""
         val_data = pagamento.data if pagamento else ""
         
-        # Lógica para o Combo de Status
         def_pagou = "Sim" if (pagamento and pagamento.pagou) else "Não"
-        if not pagamento: def_pagou = "" # Se for inclusão, deixa em branco ou seleciona o primeiro
+        if not pagamento: def_pagou = ""
 
-        # Lógica para o Combo de Forma
         def_forma = pagamento.forma_pagamento if pagamento else ""
 
         layout = [
@@ -55,13 +55,12 @@ class TelaPagamento:
             [sg.Text("Valor Total:", size=(15,1)), sg.Input(default_text=val_total, key="valor_total", size=(45,1))],
             [sg.Text("Data:", size=(15,1)), sg.Input(default_text=val_data, key="data", size=(45,1))],
             [sg.Text("Status:", size=(15,1)), sg.Combo(["Sim", "Não"], default_value=def_pagou, key="pagou", readonly=True, size=(43,1))],
-            # Nota: Alterar a forma de pagamento (ex: de Pix para Cartão) exigiria mudar os campos extras. 
-            # Para simplificar a edição, mantemos a forma visível.
             [sg.Text("Forma:", size=(15,1)), sg.Combo(["cartao", "pix", "cedulas"], default_value=def_forma, key="forma_pagamento", readonly=True, size=(43,1))],
             [sg.HorizontalSeparator()],
             [sg.Button("Confirmar", size=(20,1)), sg.Button("Cancelar", size=(20,1))]
         ]
 
+        # Aqui também removi tamanho fixo para ficar ajustado
         window = sg.Window("Dados Pagamento", layout, element_justification="center")
         event, values = window.read()
         window.close()
@@ -116,10 +115,13 @@ class TelaPagamento:
 
         layout = [
             [sg.Text("📋 Lista de Pagamentos", font=("Segoe UI", 14, "bold"))],
+            # Tabela ajustada
             [sg.Table(values=rows, headings=headers, max_col_width=50, auto_size_columns=True,
-                      justification='center', expand_x=True, expand_y=True)],
+                    justification='center', expand_x=True, expand_y=True)],
             [sg.Button("Voltar", size=(20,1))]
         ]
+        # Aqui mantive um tamanho fixo razoável (900x400) APENAS para a lista, 
+        # pois tabelas precisam de espaço. Se quiser compactar, tire o size.
         window = sg.Window("Lista Pagamentos", layout, size=(900, 400), element_justification="center")
         window.read()
         window.close()
@@ -135,8 +137,8 @@ class TelaPagamento:
         layout = [
             [sg.Text("Selecione o Pagamento:", font=("Segoe UI", 14, "bold"))],
             [sg.Table(values=rows, headings=headers, max_col_width=50, auto_size_columns=True,
-                      justification='center', key="tab", select_mode='browse', enable_events=True,
-                      expand_x=True, expand_y=True)],
+                    justification='center', key="tab", select_mode='browse', enable_events=True,
+                    expand_x=True, expand_y=True)],
             [sg.Button("Confirmar", size=(20,1)), sg.Button("Cancelar", size=(20,1))]
         ]
         window = sg.Window("Seleção Pagamento", layout, size=(900, 400), element_justification="center")

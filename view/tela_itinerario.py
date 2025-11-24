@@ -21,7 +21,7 @@ class TelaItinerario:
                 expand_x=True
             )]
         ]
-        window = sg.Window("Menu Itinerário", layout, element_justification="center", size=(600, 500))
+        window = sg.Window("Menu Itinerário", layout, element_justification="center")
         
         event, _ = window.read()
         window.close()
@@ -47,8 +47,8 @@ class TelaItinerario:
             [sg.Text("Código:", size=(15,1)), sg.Input(cod, key="codigo_itinerario", disabled=(itinerario is not None), size=(45, 1))],
             [sg.Text("Origem:", size=(15,1)), sg.Input(orig, key="origem", size=(45, 1))],
             [sg.Text("Destino:", size=(15,1)), sg.Input(dest, key="destino", size=(45, 1))],
-            [sg.Text("Data Início(d/m/a)", size=(15,1)), sg.Input(d_ini, key="data_inicio", size=(45, 1))],
-            [sg.Text("Data Fim(d/m/a)", size=(15,1)), sg.Input(d_fim, key="data_fim", size=(45, 1))],
+            [sg.Text("Data Início(dd/mm/aaaa)", size=(15,1)), sg.Input(d_ini, key="data_inicio", size=(45, 1))],
+            [sg.Text("Data Fim(dd/mm/aaaa)", size=(15,1)), sg.Input(d_fim, key="data_fim", size=(45, 1))],
             [sg.HorizontalSeparator()],
             [sg.Button("💾 Confirmar", key="confirmar", size=(20, 1)), sg.Button("↩️ Cancelar", key="cancelar", size=(20, 1))]
         ]

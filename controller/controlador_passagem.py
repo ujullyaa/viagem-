@@ -68,7 +68,7 @@ class ControladorPassagem:
             else:
                 lista_objs = self.__controlador_itinerario.itinerarios
                 dados_itinerarios = [{"codigo": it.codigo_itinerario, "origem": it.origem,
-                                      "destino": it.destino, "inicio": it.data_inicio} for it in lista_objs]
+                                    "destino": it.destino, "inicio": it.data_inicio} for it in lista_objs]
 
                 codigo_itinerario = self.__tela_passagem.seleciona_itinerario(
                     dados_itinerarios)

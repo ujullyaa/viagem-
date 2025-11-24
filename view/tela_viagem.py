@@ -9,7 +9,7 @@ class TelaViagem:
 
         layout = [
             [sg.Text('Sistema de Gerenciamento de Viagens',
-                     font='Arial 18', justification='center')],
+                    font='Arial 18', justification='center')],
             [sg.HSeparator()],
             [sg.Button('1 - Cadastrar Viagem', key=1, size=(30, 2))],
             [sg.Button('2 - Listar Viagens', key=2, size=(30, 2))],
@@ -19,11 +19,10 @@ class TelaViagem:
             [sg.Button('6 - Alterar Viagem', key=6, size=(30, 2))],
             [sg.Button('7 - Excluir Viagem', key=7, size=(30, 2))],
             [sg.Button('0 - Voltar ao Menu Principal', key='-VOLTAR-',
-                       size=(30, 2), button_color=('white', 'firebrick3'))]
+                        size=(30, 2), button_color=('white', 'firebrick3'))]
         ]
 
-        window = sg.Window('Menu Viagens', layout,
-                           finalize=True, element_justification='center')
+        window = sg.Window('Menu Viagens', layout, finalize=True, element_justification='center')
         event, values = window.read()
         window.close()
 
@@ -36,14 +35,14 @@ class TelaViagem:
 
         layout = [
             [sg.Text('Código da Viagem:', size=(20, 1)),
-             sg.Input(key='codigo')],
+            sg.Input(key='codigo')],
             [sg.Text('CPF do Passageiro:', size=(20, 1)), sg.Input(key='cpf')],
             [sg.Text('Data Partida (dd/mm/aaaa):', size=(20, 1)),
-             sg.Input(key='data_partida')],
+            sg.Input(key='data_partida')],
             [sg.Text('Data Chegada (dd/mm/aaaa):', size=(20, 1)),
-             sg.Input(key='data_chegada')],
+            sg.Input(key='data_chegada')],
             [sg.Button('Confirmar', key='confirmar'),
-             sg.Button('Cancelar', key='-CANCELAR-')]
+            sg.Button('Cancelar', key='-CANCELAR-')]
         ]
 
         window = sg.Window('Cadastrar Viagem', layout)
@@ -86,7 +85,7 @@ class TelaViagem:
         layout = [
             [sg.Text('Selecione o novo status:')],
             [sg.Combo(['Pendente', 'Confirmada', 'Em Curso', 'Concluída', 'Cancelada'],
-                      default_value='Pendente', key='status')],
+                    default_value='Pendente', key='status')],
             [sg.Button('Confirmar'), sg.Button('Cancelar', key='-CANCELAR-')]
         ]
         window = sg.Window('Atualizar Status', layout)
